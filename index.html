@@ -1,0 +1,2130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Workout Tracker</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              background: "#09090B",
+              surface: "#111113",
+              card: "#18181B",
+              border: "#27272A",
+              accent: "#3B82F6",
+              muted: "#A1A1AA",
+            },
+
+            boxShadow: {
+              glow: "0 0 30px rgba(59, 130, 246, 0.15)",
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        min-height: 100vh;
+      }
+
+      .nav-item.active {
+        background: rgba(59, 130, 246, 0.12);
+        color: #60a5fa;
+      }
+
+      .mobile-nav-item.active {
+        color: #60a5fa;
+      }
+
+      .page {
+        display: none;
+      }
+
+      .page.active {
+        display: block;
+      }
+
+      input,
+      select {
+        outline: none;
+      }
+
+      input:focus,
+      select:focus {
+        border-color: rgba(59, 130, 246, 0.7);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+      }
+
+      .mobile-drawer {
+        transform: translateX(100%);
+        transition: transform 0.25s ease;
+      }
+
+      .mobile-drawer.open {
+        transform: translateX(0);
+      }
+
+      .mobile-overlay {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+      }
+
+      .mobile-overlay.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    </style>
+  </head>
+
+  <body class="bg-background text-white antialiased">
+    <div class="min-h-screen">
+      <!-- ================================================= -->
+      <!-- DESKTOP SIDEBAR -->
+      <!-- ================================================= -->
+
+      <aside
+        class="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r border-border bg-[#0D0D0F] p-5 lg:flex lg:flex-col"
+      >
+        <!-- LOGO -->
+
+        <button
+          onclick="navigateTo('dashboard')"
+          class="mb-12 flex items-center gap-3 px-2 text-left"
+        >
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500 text-blue-50 shadow-glow"
+          >
+            <i data-lucide="dumbbell" class="h-5 w-5"></i>
+          </div>
+
+          <div>
+            <h1 class="text-sm font-bold tracking-wide">Workout Tracker</h1>
+
+            <p class="mt-0.5 text-[10px] text-zinc-500">
+              TRAIN • TRACK • IMPROVE
+            </p>
+          </div>
+        </button>
+
+        <!-- NAVIGATION -->
+
+        <nav class="space-y-2">
+          <button
+            data-page="dashboard"
+            onclick="navigateTo('dashboard')"
+            class="nav-item active flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 transition hover:bg-zinc-900 hover:text-white"
+          >
+            <i data-lucide="house" class="h-[18px] w-[18px]"></i>
+            Dashboard
+          </button>
+
+          <button
+            data-page="routine"
+            onclick="navigateTo('routine')"
+            class="nav-item flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 transition hover:bg-zinc-900 hover:text-white"
+          >
+            <i data-lucide="calendar-days" class="h-[18px] w-[18px]"></i>
+            My Routine
+          </button>
+
+          <button
+            data-page="workout"
+            onclick="navigateTo('workout')"
+            class="nav-item flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 transition hover:bg-zinc-900 hover:text-white"
+          >
+            <i data-lucide="play" class="h-[18px] w-[18px]"></i>
+            Start Workout
+          </button>
+
+          <button
+            data-page="history"
+            onclick="navigateTo('history')"
+            class="nav-item flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 transition hover:bg-zinc-900 hover:text-white"
+          >
+            <i data-lucide="history" class="h-[18px] w-[18px]"></i>
+            History
+          </button>
+
+          <button
+            data-page="progress"
+            onclick="navigateTo('progress')"
+            class="nav-item flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 transition hover:bg-zinc-900 hover:text-white"
+          >
+            <i
+              data-lucide="chart-no-axes-combined"
+              class="h-[18px] w-[18px]"
+            ></i>
+            Progress
+          </button>
+
+          <button
+            data-page="settings"
+            onclick="navigateTo('settings')"
+            class="nav-item flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 transition hover:bg-zinc-900 hover:text-white"
+          >
+            <i data-lucide="settings" class="h-[18px] w-[18px]"></i>
+            Settings
+          </button>
+        </nav>
+
+        <!-- SIDEBAR BOTTOM -->
+
+        <div class="mt-auto rounded-2xl border border-border bg-card p-4">
+          <div class="mb-3 flex justify-center">
+            <div
+              class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400"
+            >
+              <i data-lucide="trending-up" class="h-5 w-5"></i>
+            </div>
+          </div>
+
+          <h3 class="text-center text-sm font-semibold">
+            Better than yesterday.
+          </h3>
+
+          <p class="mt-2 text-center text-xs leading-relaxed text-zinc-500">
+            Small progress every day leads to big results.
+          </p>
+        </div>
+      </aside>
+
+      <!-- ================================================= -->
+      <!-- MOBILE TOP BAR (persistent across all pages) -->
+      <!-- ================================================= -->
+
+      <header
+        class="sticky top-0 z-40 flex items-center justify-between border-b border-border bg-[#0D0D0F]/95 px-4 py-3 backdrop-blur-lg lg:hidden"
+      >
+        <button
+          onclick="navigateTo('dashboard')"
+          class="flex items-center gap-3 text-left"
+        >
+          <div
+            class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500 text-blue-50 shadow-glow"
+          >
+            <i data-lucide="dumbbell" class="h-4 w-4"></i>
+          </div>
+
+          <h1 class="text-sm font-bold tracking-wide">Workout Tracker</h1>
+        </button>
+
+        <!-- MOBILE MENU BUTTON -->
+
+        <button
+          id="menu-button"
+          onclick="openMobileMenu()"
+          aria-label="Open navigation menu"
+          class="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-zinc-300 transition hover:bg-zinc-800"
+        >
+          <i data-lucide="menu" class="h-5 w-5"></i>
+        </button>
+      </header>
+
+      <!-- ================================================= -->
+      <!-- MAIN CONTENT -->
+      <!-- ================================================= -->
+
+      <main
+        class="mx-auto max-w-7xl px-4 pb-28 pt-6 sm:px-6 lg:ml-64 lg:px-10 lg:pb-10 lg:pt-10"
+      >
+        <!-- ================================================= -->
+        <!-- DASHBOARD -->
+        <!-- ================================================= -->
+
+        <section id="page-dashboard" class="page active">
+          <header class="mb-8 flex items-center justify-between">
+            <div>
+              <p
+                class="mb-2 text-xs font-medium uppercase tracking-[0.2em] text-blue-400"
+              >
+                Wednesday, September 9
+              </p>
+
+              <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+                Good morning, Abdullah
+              </h2>
+
+              <p class="mt-2 text-sm text-zinc-500">
+                Consistency builds results.
+              </p>
+            </div>
+
+            <button
+              onclick="navigateTo('workout')"
+              class="hidden items-center gap-2 rounded-xl bg-blue-500 px-5 py-3 text-sm font-semibold transition hover:bg-blue-400 hover:shadow-glow sm:flex"
+            >
+              <i data-lucide="play" class="h-4 w-4"></i>
+              Start Workout
+            </button>
+
+          </header>
+
+          <!-- MOBILE STATS -->
+
+          <section class="mb-8 lg:hidden">
+            <div class="grid grid-cols-3 gap-2">
+              <div
+                class="rounded-xl border border-border bg-gradient-to-br from-blue-500/20 to-blue-900/10 p-3 text-center"
+              >
+                <p class="text-xl font-bold">12</p>
+                <p class="mt-1 text-[10px] text-zinc-400">Workouts</p>
+              </div>
+
+              <div
+                class="rounded-xl border border-border bg-gradient-to-br from-emerald-500/20 to-emerald-900/10 p-3 text-center"
+              >
+                <p class="text-xl font-bold">48</p>
+                <p class="mt-1 text-[10px] text-zinc-400">Sets</p>
+              </div>
+
+              <div
+                class="rounded-xl border border-border bg-gradient-to-br from-purple-500/20 to-purple-900/10 p-3 text-center"
+              >
+                <p class="text-xl font-bold">5.4k</p>
+                <p class="mt-1 text-[10px] text-zinc-400">Volume</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- DESKTOP STATS -->
+
+          <section class="mb-8 hidden grid-cols-1 gap-5 md:grid-cols-3 lg:grid">
+            <div
+              class="rounded-2xl border border-border bg-card p-6 transition hover:border-blue-500/40"
+            >
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-sm text-zinc-500">Total Workouts</p>
+
+                  <h3 class="mt-3 text-3xl font-bold">12</h3>
+
+                  <p class="mt-2 text-xs text-zinc-500">This month</p>
+                </div>
+
+                <div
+                  class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400"
+                >
+                  <i data-lucide="dumbbell" class="h-5 w-5"></i>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="rounded-2xl border border-border bg-card p-6 transition hover:border-purple-500/40"
+            >
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-sm text-zinc-500">Total Sets</p>
+
+                  <h3 class="mt-3 text-3xl font-bold">48</h3>
+
+                  <p class="mt-2 text-xs text-zinc-500">This month</p>
+                </div>
+
+                <div
+                  class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/15 text-purple-400"
+                >
+                  <i data-lucide="target" class="h-5 w-5"></i>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="rounded-2xl border border-border bg-card p-6 transition hover:border-blue-500/40"
+            >
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-sm text-zinc-500">Total Volume</p>
+
+                  <h3 class="mt-3 text-3xl font-bold">5,420 kg</h3>
+
+                  <p class="mt-2 text-xs text-zinc-500">This month</p>
+                </div>
+
+                <div
+                  class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400"
+                >
+                  <i data-lucide="chart-column" class="h-5 w-5"></i>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- TODAY'S WORKOUT -->
+
+          <section
+            class="mb-6 overflow-hidden rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-500/15 to-purple-500/10 p-5 sm:p-6"
+          >
+            <div
+              class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div>
+                <div class="mb-3 flex items-center gap-2">
+                  <span
+                    class="rounded-md bg-blue-500/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-blue-400"
+                  >
+                    Today's Workout
+                  </span>
+
+                  <span class="text-xs text-zinc-500"> Wednesday </span>
+                </div>
+
+                <h3 class="text-xl font-semibold">Rest Day</h3>
+
+                <p class="mt-2 text-sm text-zinc-500">
+                  Recovery day. Your next workout is Thursday.
+                </p>
+              </div>
+
+              <div
+                class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-zinc-900/60 text-zinc-500"
+              >
+                <i data-lucide="moon" class="h-6 w-6"></i>
+              </div>
+            </div>
+          </section>
+
+          <!-- WEEKLY PROGRESS -->
+
+          <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+            <section
+              class="rounded-2xl border border-border bg-card p-5 sm:p-6"
+            >
+              <h3 class="text-lg font-semibold">Weekly Progress</h3>
+
+              <p class="mt-1 text-sm text-zinc-500">
+                Your training consistency this week
+              </p>
+
+              <div class="mt-8 flex items-end justify-between gap-3">
+                <div class="flex flex-1 flex-col items-center gap-3">
+                  <div class="h-24 w-full rounded-lg bg-blue-500/20">
+                    <div class="h-[85%] w-full rounded-lg bg-blue-500"></div>
+                  </div>
+                  <span class="text-xs text-zinc-500">Mon</span>
+                </div>
+
+                <div class="flex flex-1 flex-col items-center gap-3">
+                  <div class="h-24 w-full rounded-lg bg-emerald-500/20">
+                    <div class="h-[90%] w-full rounded-lg bg-emerald-500"></div>
+                  </div>
+                  <span class="text-xs text-zinc-500">Tue</span>
+                </div>
+
+                <div class="flex flex-1 flex-col items-center gap-3">
+                  <div class="h-24 w-full rounded-lg bg-zinc-800">
+                    <div class="h-0 w-full rounded-lg bg-zinc-600"></div>
+                  </div>
+                  <span class="text-xs text-zinc-500">Wed</span>
+                </div>
+
+                <div class="flex flex-1 flex-col items-center gap-3">
+                  <div class="h-24 w-full rounded-lg bg-purple-500/20">
+                    <div class="h-[70%] w-full rounded-lg bg-purple-500"></div>
+                  </div>
+                  <span class="text-xs text-zinc-500">Thu</span>
+                </div>
+
+                <div class="flex flex-1 flex-col items-center gap-3">
+                  <div class="h-24 w-full rounded-lg bg-zinc-800"></div>
+                  <span class="text-xs text-zinc-500">Fri</span>
+                </div>
+
+                <div class="flex flex-1 flex-col items-center gap-3">
+                  <div class="h-24 w-full rounded-lg bg-zinc-800"></div>
+                  <span class="text-xs text-zinc-500">Sat</span>
+                </div>
+
+                <div class="flex flex-1 flex-col items-center gap-3">
+                  <div class="h-24 w-full rounded-lg bg-zinc-800"></div>
+                  <span class="text-xs text-zinc-500">Sun</span>
+                </div>
+              </div>
+            </section>
+
+            <!-- RECENT WORKOUTS -->
+
+            <section
+              class="rounded-2xl border border-border bg-card p-5 sm:p-6"
+            >
+              <div class="mb-5 flex items-center justify-between">
+                <div>
+                  <h3 class="text-lg font-semibold">Recent Workouts</h3>
+
+                  <p class="mt-1 text-sm text-zinc-500">
+                    Your latest training sessions
+                  </p>
+                </div>
+
+                <button
+                  onclick="navigateTo('history')"
+                  class="text-xs font-medium text-blue-400 hover:text-blue-300"
+                >
+                  View all
+                </button>
+              </div>
+
+              <div class="divide-y divide-border">
+                <button
+                  onclick="navigateTo('history')"
+                  class="flex w-full items-center gap-4 py-4 text-left first:pt-0"
+                >
+                  <div
+                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400"
+                  >
+                    <i data-lucide="dumbbell" class="h-5 w-5"></i>
+                  </div>
+
+                  <div class="min-w-0 flex-1">
+                    <h4 class="truncate text-sm font-medium">Push Day</h4>
+
+                    <p class="mt-1 text-xs text-zinc-500">
+                      September 8 • 52 min
+                    </p>
+                  </div>
+
+                  <i
+                    data-lucide="chevron-right"
+                    class="h-4 w-4 text-zinc-600"
+                  ></i>
+                </button>
+
+                <button
+                  onclick="navigateTo('history')"
+                  class="flex w-full items-center gap-4 py-4 text-left"
+                >
+                  <div
+                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-purple-500/15 text-purple-400"
+                  >
+                    <i data-lucide="footprints" class="h-5 w-5"></i>
+                  </div>
+
+                  <div class="min-w-0 flex-1">
+                    <h4 class="truncate text-sm font-medium">Leg Day</h4>
+
+                    <p class="mt-1 text-xs text-zinc-500">
+                      September 6 • 58 min
+                    </p>
+                  </div>
+
+                  <i
+                    data-lucide="chevron-right"
+                    class="h-4 w-4 text-zinc-600"
+                  ></i>
+                </button>
+
+                <button
+                  onclick="navigateTo('history')"
+                  class="flex w-full items-center gap-4 py-4 text-left"
+                >
+                  <div
+                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400"
+                  >
+                    <i data-lucide="activity" class="h-5 w-5"></i>
+                  </div>
+
+                  <div class="min-w-0 flex-1">
+                    <h4 class="truncate text-sm font-medium">Pull Day</h4>
+
+                    <p class="mt-1 text-xs text-zinc-500">
+                      September 4 • 48 min
+                    </p>
+                  </div>
+
+                  <i
+                    data-lucide="chevron-right"
+                    class="h-4 w-4 text-zinc-600"
+                  ></i>
+                </button>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <!-- ================================================= -->
+        <!-- MY ROUTINE -->
+        <!-- ================================================= -->
+
+        <section id="page-routine" class="page">
+          <header class="mb-8">
+            <p
+              class="mb-2 text-xs font-medium uppercase tracking-[0.2em] text-blue-400"
+            >
+              Your weekly plan
+            </p>
+
+            <div
+              class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
+            >
+              <div>
+                <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+                  My Routine
+                </h2>
+
+                <p class="mt-2 text-sm text-zinc-500">
+                  Set up your weekly workouts once and reuse them every week.
+                </p>
+              </div>
+
+              <button
+                class="flex items-center justify-center gap-2 rounded-xl bg-blue-500 px-5 py-3 text-sm font-semibold transition hover:bg-blue-400"
+              >
+                <i data-lucide="plus" class="h-4 w-4"></i>
+                Add Workout Day
+              </button>
+            </div>
+          </header>
+
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <!-- MONDAY -->
+
+            <article class="rounded-2xl border border-border bg-card p-5">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p
+                    class="text-xs font-medium uppercase tracking-wider text-blue-400"
+                  >
+                    Monday
+                  </p>
+
+                  <h3 class="mt-2 text-xl font-semibold">Push Day</h3>
+
+                  <p class="mt-1 text-sm text-zinc-500">
+                    5 exercises • 15 sets
+                  </p>
+                </div>
+
+                <button
+                  class="rounded-lg p-2 text-zinc-500 transition hover:bg-zinc-800 hover:text-white"
+                >
+                  <i data-lucide="more-horizontal" class="h-4 w-4"></i>
+                </button>
+              </div>
+
+              <div class="mt-5 space-y-3 border-t border-border pt-4">
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-zinc-300">Bench Press</span>
+                  <span class="text-zinc-500">3 sets</span>
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-zinc-300">Incline DB Press</span>
+                  <span class="text-zinc-500">3 sets</span>
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-zinc-300">Shoulder Press</span>
+                  <span class="text-zinc-500">3 sets</span>
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-zinc-300">Lateral Raises</span>
+                  <span class="text-zinc-500">3 sets</span>
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-zinc-300">Tricep Pushdowns</span>
+                  <span class="text-zinc-500">3 sets</span>
+                </div>
+              </div>
+
+              <button
+                class="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-border py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-zinc-800 hover:text-white"
+              >
+                <i data-lucide="pencil" class="h-4 w-4"></i>
+                Edit Routine
+              </button>
+            </article>
+
+            <!-- TUESDAY -->
+
+            <article class="rounded-2xl border border-border bg-card p-5">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p
+                    class="text-xs font-medium uppercase tracking-wider text-blue-400"
+                  >
+                    Tuesday
+                  </p>
+
+                  <h3 class="mt-2 text-xl font-semibold">Pull Day</h3>
+
+                  <p class="mt-1 text-sm text-zinc-500">
+                    4 exercises • 12 sets
+                  </p>
+                </div>
+
+                <button
+                  class="rounded-lg p-2 text-zinc-500 transition hover:bg-zinc-800 hover:text-white"
+                >
+                  <i data-lucide="more-horizontal" class="h-4 w-4"></i>
+                </button>
+              </div>
+
+              <div class="mt-5 space-y-3 border-t border-border pt-4">
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-zinc-300">Lat Pulldown</span>
+                  <span class="text-zinc-500">3 sets</span>
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-zinc-300">Barbell Row</span>
+                  <span class="text-zinc-500">3 sets</span>
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-zinc-300">Cable Row</span>
+                  <span class="text-zinc-500">3 sets</span>
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-zinc-300">Bicep Curl</span>
+                  <span class="text-zinc-500">3 sets</span>
+                </div>
+              </div>
+
+              <button
+                class="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-border py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-zinc-800 hover:text-white"
+              >
+                <i data-lucide="pencil" class="h-4 w-4"></i>
+                Edit Routine
+              </button>
+            </article>
+
+            <!-- WEDNESDAY -->
+
+            <article class="rounded-2xl border border-border bg-card p-5">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p
+                    class="text-xs font-medium uppercase tracking-wider text-zinc-500"
+                  >
+                    Wednesday
+                  </p>
+
+                  <h3 class="mt-2 text-xl font-semibold text-zinc-300">
+                    Rest Day
+                  </h3>
+
+                  <p class="mt-1 text-sm text-zinc-500">No workout scheduled</p>
+                </div>
+
+                <div
+                  class="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-800 text-zinc-500"
+                >
+                  <i data-lucide="moon" class="h-4 w-4"></i>
+                </div>
+              </div>
+
+              <div
+                class="mt-5 rounded-xl border border-dashed border-border p-4 text-center"
+              >
+                <p class="text-xs text-zinc-500">Recovery day</p>
+              </div>
+
+              <button
+                class="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-border py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-zinc-800 hover:text-white"
+              >
+                <i data-lucide="plus" class="h-4 w-4"></i>
+                Add Workout
+              </button>
+            </article>
+
+            <!-- THURSDAY -->
+
+            <article class="rounded-2xl border border-border bg-card p-5">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p
+                    class="text-xs font-medium uppercase tracking-wider text-blue-400"
+                  >
+                    Thursday
+                  </p>
+
+                  <h3 class="mt-2 text-xl font-semibold">Leg Day</h3>
+
+                  <p class="mt-1 text-sm text-zinc-500">
+                    5 exercises • 15 sets
+                  </p>
+                </div>
+
+                <button
+                  class="rounded-lg p-2 text-zinc-500 transition hover:bg-zinc-800 hover:text-white"
+                >
+                  <i data-lucide="more-horizontal" class="h-4 w-4"></i>
+                </button>
+              </div>
+
+              <div class="mt-5 space-y-3 border-t border-border pt-4">
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-zinc-300">Squat</span>
+                  <span class="text-zinc-500">3 sets</span>
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-zinc-300">Romanian Deadlift</span>
+                  <span class="text-zinc-500">3 sets</span>
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-zinc-300">Leg Press</span>
+                  <span class="text-zinc-500">3 sets</span>
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-zinc-300">Leg Curl</span>
+                  <span class="text-zinc-500">3 sets</span>
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-zinc-300">Calf Raises</span>
+                  <span class="text-zinc-500">3 sets</span>
+                </div>
+              </div>
+
+              <button
+                class="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-border py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-zinc-800 hover:text-white"
+              >
+                <i data-lucide="pencil" class="h-4 w-4"></i>
+                Edit Routine
+              </button>
+            </article>
+
+            <!-- FRIDAY -->
+
+            <article class="rounded-2xl border border-border bg-card p-5">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p
+                    class="text-xs font-medium uppercase tracking-wider text-zinc-500"
+                  >
+                    Friday
+                  </p>
+
+                  <h3 class="mt-2 text-xl font-semibold text-zinc-300">
+                    Rest Day
+                  </h3>
+
+                  <p class="mt-1 text-sm text-zinc-500">No workout scheduled</p>
+                </div>
+
+                <div
+                  class="flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-800 text-zinc-500"
+                >
+                  <i data-lucide="moon" class="h-4 w-4"></i>
+                </div>
+              </div>
+
+              <div
+                class="mt-5 rounded-xl border border-dashed border-border p-4 text-center"
+              >
+                <p class="text-xs text-zinc-500">Recovery day</p>
+              </div>
+
+              <button
+                class="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-border py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-zinc-800 hover:text-white"
+              >
+                <i data-lucide="plus" class="h-4 w-4"></i>
+                Add Workout
+              </button>
+            </article>
+
+            <!-- SATURDAY -->
+
+            <article class="rounded-2xl border border-border bg-card p-5">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p
+                    class="text-xs font-medium uppercase tracking-wider text-blue-400"
+                  >
+                    Saturday
+                  </p>
+
+                  <h3 class="mt-2 text-xl font-semibold">Upper Body</h3>
+
+                  <p class="mt-1 text-sm text-zinc-500">
+                    4 exercises • 12 sets
+                  </p>
+                </div>
+
+                <button
+                  class="rounded-lg p-2 text-zinc-500 transition hover:bg-zinc-800 hover:text-white"
+                >
+                  <i data-lucide="more-horizontal" class="h-4 w-4"></i>
+                </button>
+              </div>
+
+              <div class="mt-5 space-y-3 border-t border-border pt-4">
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-zinc-300">Bench Press</span>
+                  <span class="text-zinc-500">3 sets</span>
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-zinc-300">Pull Ups</span>
+                  <span class="text-zinc-500">3 sets</span>
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-zinc-300">Shoulder Press</span>
+                  <span class="text-zinc-500">3 sets</span>
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-zinc-300">Cable Row</span>
+                  <span class="text-zinc-500">3 sets</span>
+                </div>
+              </div>
+
+              <button
+                class="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-border py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-zinc-800 hover:text-white"
+              >
+                <i data-lucide="pencil" class="h-4 w-4"></i>
+                Edit Routine
+              </button>
+            </article>
+          </div>
+        </section>
+
+        <!-- ================================================= -->
+        <!-- START WORKOUT -->
+        <!-- ================================================= -->
+
+        <section id="page-workout" class="page">
+          <header class="mb-8">
+            <p
+              class="mb-2 text-xs font-medium uppercase tracking-[0.2em] text-blue-400"
+            >
+              Training session
+            </p>
+
+            <div
+              class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
+            >
+              <div>
+                <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+                  Start Workout
+                </h2>
+
+                <p class="mt-2 text-sm text-zinc-500">
+                  Log your performance as you complete each set.
+                </p>
+              </div>
+
+              <div class="rounded-xl border border-border bg-card px-4 py-3">
+                <p class="text-[10px] uppercase tracking-wider text-zinc-500">
+                  Elapsed Time
+                </p>
+
+                <p class="mt-1 font-mono text-lg font-semibold">00:00:00</p>
+              </div>
+            </div>
+          </header>
+
+          <!-- WORKOUT HEADER -->
+
+          <section
+            class="mb-6 rounded-2xl border border-border bg-card p-5 sm:p-6"
+          >
+            <div
+              class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div>
+                <p class="text-xs text-zinc-500">Today's routine</p>
+
+                <h3 class="mt-1 text-xl font-semibold">Push Day</h3>
+
+                <p class="mt-1 text-sm text-zinc-500">
+                  Monday • 5 exercises • 15 sets
+                </p>
+              </div>
+
+              <button
+                class="flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-zinc-800"
+              >
+                <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
+                Reset
+              </button>
+            </div>
+          </section>
+
+          <!-- ================================================= -->
+          <!-- EXERCISE 1 -->
+          <!-- ================================================= -->
+
+          <section
+            class="mb-5 rounded-2xl border border-border bg-card p-5 sm:p-6"
+          >
+            <div class="mb-5 flex items-center justify-between">
+              <div>
+                <p class="text-xs uppercase tracking-wider text-blue-400">
+                  Exercise 1
+                </p>
+
+                <h3 class="mt-1 text-lg font-semibold">Bench Press</h3>
+              </div>
+
+              <span class="text-xs text-zinc-500"> 3 sets </span>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full min-w-[420px] text-left">
+                <thead>
+                  <tr class="border-b border-border text-xs text-zinc-500">
+                    <th class="pb-3 font-medium">Set</th>
+
+                    <th class="pb-3 font-medium">Weight</th>
+
+                    <th class="pb-3 font-medium">Reps</th>
+
+                    <th class="pb-3 text-right font-medium">Done</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <!-- SET 1 -->
+
+                  <tr class="border-b border-border">
+                    <td class="py-3 text-sm text-zinc-400">1</td>
+
+                    <td class="py-3">
+                      <div class="flex items-center gap-2">
+                        <input
+                          type="number"
+                          value="60"
+                          class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                        />
+
+                        <span class="text-xs text-zinc-500"> kg </span>
+                      </div>
+                    </td>
+
+                    <td class="py-3">
+                      <input
+                        type="number"
+                        value="10"
+                        class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                      />
+                    </td>
+
+                    <td class="py-3 text-right">
+                      <button class="text-emerald-400">
+                        <i data-lucide="check-circle-2" class="h-5 w-5"></i>
+                      </button>
+                    </td>
+                  </tr>
+
+                  <!-- SET 2 -->
+
+                  <tr class="border-b border-border">
+                    <td class="py-3 text-sm text-zinc-400">2</td>
+
+                    <td class="py-3">
+                      <div class="flex items-center gap-2">
+                        <input
+                          type="number"
+                          value="60"
+                          class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                        />
+
+                        <span class="text-xs text-zinc-500"> kg </span>
+                      </div>
+                    </td>
+
+                    <td class="py-3">
+                      <input
+                        type="number"
+                        value="9"
+                        class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                      />
+                    </td>
+
+                    <td class="py-3 text-right">
+                      <button class="text-zinc-600">
+                        <i data-lucide="circle" class="h-5 w-5"></i>
+                      </button>
+                    </td>
+                  </tr>
+
+                  <!-- SET 3 -->
+
+                  <tr>
+                    <td class="py-3 text-sm text-zinc-400">3</td>
+
+                    <td class="py-3">
+                      <div class="flex items-center gap-2">
+                        <input
+                          type="number"
+                          value="60"
+                          class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                        />
+
+                        <span class="text-xs text-zinc-500"> kg </span>
+                      </div>
+                    </td>
+
+                    <td class="py-3">
+                      <input
+                        type="number"
+                        value="8"
+                        class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                      />
+                    </td>
+
+                    <td class="py-3 text-right">
+                      <button class="text-zinc-600">
+                        <i data-lucide="circle" class="h-5 w-5"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <button
+              class="mt-4 flex items-center gap-2 text-xs font-medium text-zinc-500 transition hover:text-zinc-300"
+            >
+              <i data-lucide="plus" class="h-4 w-4"></i>
+              Add Set
+            </button>
+          </section>
+
+          <!-- ================================================= -->
+          <!-- EXERCISE 2 -->
+          <!-- ================================================= -->
+
+          <section
+            class="mb-5 rounded-2xl border border-border bg-card p-5 sm:p-6"
+          >
+            <div class="mb-5 flex items-center justify-between">
+              <div>
+                <p class="text-xs uppercase tracking-wider text-blue-400">
+                  Exercise 2
+                </p>
+
+                <h3 class="mt-1 text-lg font-semibold">
+                  Incline Dumbbell Press
+                </h3>
+              </div>
+
+              <span class="text-xs text-zinc-500"> 3 sets </span>
+            </div>
+
+            <!-- SAME TABLE STRUCTURE AS EXERCISE 1 -->
+
+            <div class="overflow-x-auto">
+              <table class="w-full min-w-[420px] text-left">
+                <thead>
+                  <tr class="border-b border-border text-xs text-zinc-500">
+                    <th class="pb-3 font-medium">Set</th>
+
+                    <th class="pb-3 font-medium">Weight</th>
+
+                    <th class="pb-3 font-medium">Reps</th>
+
+                    <th class="pb-3 text-right font-medium">Done</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <!-- SET 1 -->
+
+                  <tr class="border-b border-border">
+                    <td class="py-3 text-sm text-zinc-400">1</td>
+
+                    <td class="py-3">
+                      <div class="flex items-center gap-2">
+                        <input
+                          type="number"
+                          value="20"
+                          class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                        />
+
+                        <span class="text-xs text-zinc-500"> kg </span>
+                      </div>
+                    </td>
+
+                    <td class="py-3">
+                      <input
+                        type="number"
+                        value="12"
+                        class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                      />
+                    </td>
+
+                    <td class="py-3 text-right">
+                      <button class="text-emerald-400">
+                        <i data-lucide="check-circle-2" class="h-5 w-5"></i>
+                      </button>
+                    </td>
+                  </tr>
+
+                  <!-- SET 2 -->
+
+                  <tr class="border-b border-border">
+                    <td class="py-3 text-sm text-zinc-400">2</td>
+
+                    <td class="py-3">
+                      <div class="flex items-center gap-2">
+                        <input
+                          type="number"
+                          value="20"
+                          class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                        />
+
+                        <span class="text-xs text-zinc-500"> kg </span>
+                      </div>
+                    </td>
+
+                    <td class="py-3">
+                      <input
+                        type="number"
+                        value="10"
+                        class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                      />
+                    </td>
+
+                    <td class="py-3 text-right">
+                      <button class="text-emerald-400">
+                        <i data-lucide="check-circle-2" class="h-5 w-5"></i>
+                      </button>
+                    </td>
+                  </tr>
+
+                  <!-- SET 3 -->
+
+                  <tr>
+                    <td class="py-3 text-sm text-zinc-400">3</td>
+
+                    <td class="py-3">
+                      <div class="flex items-center gap-2">
+                        <input
+                          type="number"
+                          value="20"
+                          class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                        />
+
+                        <span class="text-xs text-zinc-500"> kg </span>
+                      </div>
+                    </td>
+
+                    <td class="py-3">
+                      <input
+                        type="number"
+                        value="9"
+                        class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                      />
+                    </td>
+
+                    <td class="py-3 text-right">
+                      <button class="text-zinc-600">
+                        <i data-lucide="circle" class="h-5 w-5"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <button
+              class="mt-4 flex items-center gap-2 text-xs font-medium text-zinc-500 transition hover:text-zinc-300"
+            >
+              <i data-lucide="plus" class="h-4 w-4"></i>
+              Add Set
+            </button>
+          </section>
+
+          <!-- ================================================= -->
+          <!-- EXERCISE 3 -->
+          <!-- ================================================= -->
+
+          <section
+            class="mb-5 rounded-2xl border border-border bg-card p-5 sm:p-6"
+          >
+            <div class="mb-5 flex items-center justify-between">
+              <div>
+                <p class="text-xs uppercase tracking-wider text-blue-400">
+                  Exercise 3
+                </p>
+
+                <h3 class="mt-1 text-lg font-semibold">Shoulder Press</h3>
+              </div>
+
+              <span class="text-xs text-zinc-500"> 3 sets </span>
+            </div>
+
+            <!-- SAME TABLE STRUCTURE AS EXERCISES 1 AND 2 -->
+
+            <div class="overflow-x-auto">
+              <table class="w-full min-w-[420px] text-left">
+                <thead>
+                  <tr class="border-b border-border text-xs text-zinc-500">
+                    <th class="pb-3 font-medium">Set</th>
+
+                    <th class="pb-3 font-medium">Weight</th>
+
+                    <th class="pb-3 font-medium">Reps</th>
+
+                    <th class="pb-3 text-right font-medium">Done</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <!-- SET 1 -->
+
+                  <tr class="border-b border-border">
+                    <td class="py-3 text-sm text-zinc-400">1</td>
+
+                    <td class="py-3">
+                      <div class="flex items-center gap-2">
+                        <input
+                          type="number"
+                          class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                          placeholder="Weight"
+                        />
+
+                        <span class="text-xs text-zinc-500"> kg </span>
+                      </div>
+                    </td>
+
+                    <td class="py-3">
+                      <input
+                        type="number"
+                        class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                        placeholder="Reps"
+                      />
+                    </td>
+
+                    <td class="py-3 text-right">
+                      <button class="text-zinc-600">
+                        <i data-lucide="circle" class="h-5 w-5"></i>
+                      </button>
+                    </td>
+                  </tr>
+
+                  <!-- SET 2 -->
+
+                  <tr class="border-b border-border">
+                    <td class="py-3 text-sm text-zinc-400">2</td>
+
+                    <td class="py-3">
+                      <div class="flex items-center gap-2">
+                        <input
+                          type="number"
+                          class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                          placeholder="Weight"
+                        />
+
+                        <span class="text-xs text-zinc-500"> kg </span>
+                      </div>
+                    </td>
+
+                    <td class="py-3">
+                      <input
+                        type="number"
+                        class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                        placeholder="Reps"
+                      />
+                    </td>
+
+                    <td class="py-3 text-right">
+                      <button class="text-zinc-600">
+                        <i data-lucide="circle" class="h-5 w-5"></i>
+                      </button>
+                    </td>
+                  </tr>
+
+                  <!-- SET 3 -->
+
+                  <tr>
+                    <td class="py-3 text-sm text-zinc-400">3</td>
+
+                    <td class="py-3">
+                      <div class="flex items-center gap-2">
+                        <input
+                          type="number"
+                          class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                          placeholder="Weight"
+                        />
+
+                        <span class="text-xs text-zinc-500"> kg </span>
+                      </div>
+                    </td>
+
+                    <td class="py-3">
+                      <input
+                        type="number"
+                        class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                        placeholder="Reps"
+                      />
+                    </td>
+
+                    <td class="py-3 text-right">
+                      <button class="text-zinc-600">
+                        <i data-lucide="circle" class="h-5 w-5"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <button
+              class="mt-4 flex items-center gap-2 text-xs font-medium text-zinc-500 transition hover:text-zinc-300"
+            >
+              <i data-lucide="plus" class="h-4 w-4"></i>
+              Add Set
+            </button>
+          </section>
+
+          <!-- FINISH -->
+
+          <div class="sticky bottom-20 z-20 mt-6 lg:bottom-4">
+            <button
+              onclick="navigateTo('history')"
+              class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 py-4 text-sm font-semibold shadow-lg shadow-blue-500/20 transition hover:bg-blue-400"
+            >
+              <i data-lucide="check" class="h-4 w-4"></i>
+              Finish Workout
+            </button>
+          </div>
+        </section>
+
+        <!-- ================================================= -->
+        <!-- HISTORY -->
+        <!-- ================================================= -->
+
+        <section id="page-history" class="page">
+          <header class="mb-8">
+            <p
+              class="mb-2 text-xs font-medium uppercase tracking-[0.2em] text-blue-400"
+            >
+              Training records
+            </p>
+
+            <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+              Workout History
+            </h2>
+
+            <p class="mt-2 text-sm text-zinc-500">
+              Every completed workout is saved as its own historical session.
+            </p>
+          </header>
+
+          <!-- FILTERS -->
+
+          <section class="mb-6 rounded-2xl border border-border bg-card p-4">
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <select
+                class="rounded-xl border border-border bg-[#101012] px-4 py-3 text-sm text-zinc-300"
+              >
+                <option>All Workouts</option>
+
+                <option>Push Day</option>
+
+                <option>Pull Day</option>
+
+                <option>Leg Day</option>
+              </select>
+
+              <select
+                class="rounded-xl border border-border bg-[#101012] px-4 py-3 text-sm text-zinc-300"
+              >
+                <option>All Time</option>
+
+                <option>This Month</option>
+
+                <option>Last 3 Months</option>
+
+                <option>This Year</option>
+              </select>
+
+              <button
+                class="flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-3 text-sm text-zinc-400 transition hover:bg-zinc-800 hover:text-white"
+              >
+                <i data-lucide="filter" class="h-4 w-4"></i>
+                Filters
+              </button>
+            </div>
+          </section>
+
+          <!-- HISTORY LIST -->
+
+          <section class="rounded-2xl border border-border bg-card p-5 sm:p-6">
+            <div class="space-y-1">
+              <button
+                class="flex w-full items-center gap-4 rounded-xl p-4 text-left transition hover:bg-zinc-900"
+              >
+                <div
+                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400"
+                >
+                  <i data-lucide="dumbbell" class="h-5 w-5"></i>
+                </div>
+
+                <div class="min-w-0 flex-1">
+                  <h3 class="text-sm font-medium">Push Day</h3>
+
+                  <p class="mt-1 text-xs text-zinc-500">
+                    September 8, 2026 • 5 exercises • 15 sets
+                  </p>
+                </div>
+
+                <i
+                  data-lucide="chevron-right"
+                  class="h-4 w-4 text-zinc-600"
+                ></i>
+              </button>
+
+              <button
+                class="flex w-full items-center gap-4 rounded-xl p-4 text-left transition hover:bg-zinc-900"
+              >
+                <div
+                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-purple-500/15 text-purple-400"
+                >
+                  <i data-lucide="footprints" class="h-5 w-5"></i>
+                </div>
+
+                <div class="min-w-0 flex-1">
+                  <h3 class="text-sm font-medium">Leg Day</h3>
+
+                  <p class="mt-1 text-xs text-zinc-500">
+                    September 6, 2026 • 5 exercises • 15 sets
+                  </p>
+                </div>
+
+                <i
+                  data-lucide="chevron-right"
+                  class="h-4 w-4 text-zinc-600"
+                ></i>
+              </button>
+
+              <button
+                class="flex w-full items-center gap-4 rounded-xl p-4 text-left transition hover:bg-zinc-900"
+              >
+                <div
+                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400"
+                >
+                  <i data-lucide="activity" class="h-5 w-5"></i>
+                </div>
+
+                <div class="min-w-0 flex-1">
+                  <h3 class="text-sm font-medium">Pull Day</h3>
+
+                  <p class="mt-1 text-xs text-zinc-500">
+                    September 4, 2026 • 4 exercises • 12 sets
+                  </p>
+                </div>
+
+                <i
+                  data-lucide="chevron-right"
+                  class="h-4 w-4 text-zinc-600"
+                ></i>
+              </button>
+            </div>
+          </section>
+        </section>
+
+        <!-- ================================================= -->
+        <!-- PROGRESS -->
+        <!-- ================================================= -->
+
+        <section id="page-progress" class="page">
+          <header class="mb-8">
+            <p
+              class="mb-2 text-xs font-medium uppercase tracking-[0.2em] text-blue-400"
+            >
+              Performance analysis
+            </p>
+
+            <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+              Progress
+            </h2>
+
+            <p class="mt-2 text-sm text-zinc-500">
+              Compare your performance across previous workout sessions.
+            </p>
+          </header>
+
+          <!-- EXERCISE SELECTOR -->
+
+          <section class="mb-6 rounded-2xl border border-border bg-card p-5">
+            <label class="text-xs font-medium text-zinc-500">
+              Select Exercise
+            </label>
+
+            <select
+              class="mt-2 w-full rounded-xl border border-border bg-[#101012] px-4 py-3 text-sm text-zinc-300 sm:max-w-sm"
+            >
+              <option>Bench Press</option>
+
+              <option>Incline Dumbbell Press</option>
+
+              <option>Shoulder Press</option>
+
+              <option>Squat</option>
+
+              <option>Lat Pulldown</option>
+            </select>
+          </section>
+
+          <!-- CHART -->
+
+          <section class="rounded-2xl border border-border bg-card p-5 sm:p-6">
+            <div class="mb-6">
+              <h3 class="text-lg font-semibold">Bench Press</h3>
+
+              <p class="mt-1 text-sm text-zinc-500">
+                Weight progression over your completed sessions
+              </p>
+            </div>
+
+            <div
+              class="relative h-64 overflow-hidden rounded-xl border border-border bg-[#101012]"
+            >
+              <div
+                class="absolute inset-0 flex flex-col justify-between p-6 opacity-20"
+              >
+                <div class="border-t border-zinc-600"></div>
+                <div class="border-t border-zinc-600"></div>
+                <div class="border-t border-zinc-600"></div>
+                <div class="border-t border-zinc-600"></div>
+                <div class="border-t border-zinc-600"></div>
+              </div>
+
+              <svg
+                class="absolute inset-0 h-full w-full"
+                viewBox="0 0 700 300"
+                preserveAspectRatio="none"
+              >
+                <polyline
+                  points="30,240 140,210 250,220 360,170 470,155 580,105 680,70"
+                  fill="none"
+                  stroke="#3B82F6"
+                  stroke-width="4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+
+                <circle cx="30" cy="240" r="5" fill="#3B82F6"></circle>
+                <circle cx="140" cy="210" r="5" fill="#3B82F6"></circle>
+                <circle cx="250" cy="220" r="5" fill="#3B82F6"></circle>
+                <circle cx="360" cy="170" r="5" fill="#3B82F6"></circle>
+                <circle cx="470" cy="155" r="5" fill="#3B82F6"></circle>
+                <circle cx="580" cy="105" r="5" fill="#3B82F6"></circle>
+                <circle cx="680" cy="70" r="5" fill="#3B82F6"></circle>
+              </svg>
+            </div>
+
+            <div class="mt-4 flex justify-between text-xs text-zinc-600">
+              <span> Aug 1 </span>
+
+              <span> Aug 15 </span>
+
+              <span> Sep 1 </span>
+
+              <span> Sep 8 </span>
+            </div>
+          </section>
+        </section>
+
+        <!-- ================================================= -->
+        <!-- SETTINGS -->
+        <!-- ================================================= -->
+
+        <section id="page-settings" class="page">
+          <header class="mb-8">
+            <p
+              class="mb-2 text-xs font-medium uppercase tracking-[0.2em] text-blue-400"
+            >
+              Application preferences
+            </p>
+
+            <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+              Settings
+            </h2>
+
+            <p class="mt-2 text-sm text-zinc-500">
+              Configure how your workout tracker behaves.
+            </p>
+          </header>
+
+          <div class="max-w-3xl space-y-5">
+            <section
+              class="rounded-2xl border border-border bg-card p-5 sm:p-6"
+            >
+              <div class="flex items-center gap-3">
+                <div
+                  class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400"
+                >
+                  <i data-lucide="user" class="h-5 w-5"></i>
+                </div>
+
+                <div>
+                  <h3 class="font-semibold">Profile</h3>
+
+                  <p class="mt-1 text-xs text-zinc-500">Basic information</p>
+                </div>
+              </div>
+
+              <div class="mt-6 space-y-4">
+                <div>
+                  <label class="text-xs font-medium text-zinc-500">
+                    Name
+                  </label>
+
+                  <input
+                    type="text"
+                    value="Abdullah"
+                    class="mt-2 w-full rounded-xl border border-border bg-[#101012] px-4 py-3 text-sm"
+                  />
+                </div>
+              </div>
+            </section>
+
+            <section
+              class="rounded-2xl border border-border bg-card p-5 sm:p-6"
+            >
+              <div class="flex items-center gap-3">
+                <div
+                  class="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/15 text-purple-400"
+                >
+                  <i data-lucide="database" class="h-5 w-5"></i>
+                </div>
+
+                <div>
+                  <h3 class="font-semibold">Data</h3>
+
+                  <p class="mt-1 text-xs text-zinc-500">
+                    Manage your workout data
+                  </p>
+                </div>
+              </div>
+
+              <p class="mt-5 text-sm leading-relaxed text-zinc-400">
+                Your workout data will be stored locally in your browser.
+              </p>
+
+              <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+                <button
+                  class="flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-3 text-sm font-medium text-zinc-300 transition hover:bg-zinc-800"
+                >
+                  <i data-lucide="download" class="h-4 w-4"></i>
+                  Export Data
+                </button>
+
+                <button
+                  class="flex items-center justify-center gap-2 rounded-xl border border-red-500/20 px-4 py-3 text-sm font-medium text-red-400 transition hover:bg-red-500/10"
+                >
+                  <i data-lucide="trash-2" class="h-4 w-4"></i>
+                  Clear Data
+                </button>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+
+      <!-- ================================================= -->
+      <!-- MOBILE BOTTOM NAVIGATION -->
+      <!-- ================================================= -->
+
+      <nav
+        class="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-[#0D0D0F]/95 px-2 backdrop-blur-lg lg:hidden"
+      >
+        <div class="grid grid-cols-5">
+          <button
+            data-mobile-page="dashboard"
+            onclick="navigateTo('dashboard')"
+            class="mobile-nav-item active flex flex-col items-center gap-1 py-3 text-zinc-500"
+          >
+            <i data-lucide="house" class="h-[18px] w-[18px]"></i>
+            <span class="text-[10px]">Home</span>
+          </button>
+
+          <button
+            data-mobile-page="routine"
+            onclick="navigateTo('routine')"
+            class="mobile-nav-item flex flex-col items-center gap-1 py-3 text-zinc-500"
+          >
+            <i data-lucide="calendar-days" class="h-[18px] w-[18px]"></i>
+            <span class="text-[10px]">Routine</span>
+          </button>
+
+          <button
+            data-mobile-page="workout"
+            onclick="navigateTo('workout')"
+            class="mobile-nav-item flex flex-col items-center gap-1 py-3 text-zinc-500"
+          >
+            <i data-lucide="play" class="h-[18px] w-[18px]"></i>
+            <span class="text-[10px]">Workout</span>
+          </button>
+
+          <button
+            data-mobile-page="history"
+            onclick="navigateTo('history')"
+            class="mobile-nav-item flex flex-col items-center gap-1 py-3 text-zinc-500"
+          >
+            <i data-lucide="history" class="h-[18px] w-[18px]"></i>
+            <span class="text-[10px]">History</span>
+          </button>
+
+          <button
+            data-mobile-page="progress"
+            onclick="navigateTo('progress')"
+            class="mobile-nav-item flex flex-col items-center gap-1 py-3 text-zinc-500"
+          >
+            <i
+              data-lucide="chart-no-axes-combined"
+              class="h-[18px] w-[18px]"
+            ></i>
+            <span class="text-[10px]">Progress</span>
+          </button>
+        </div>
+      </nav>
+
+      <!-- ================================================= -->
+      <!-- MOBILE START WORKOUT BUTTON -->
+      <!-- ================================================= -->
+
+      <div
+        id="mobile-workout-button"
+        class="fixed bottom-[68px] left-0 right-0 z-40 px-4 lg:hidden"
+      >
+        <button
+          onclick="navigateTo('workout')"
+          class="flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-500 py-4 text-sm font-semibold shadow-lg shadow-blue-500/20 transition active:scale-[0.98]"
+        >
+          <i data-lucide="play" class="h-4 w-4"></i>
+          Start Workout
+        </button>
+      </div>
+
+      <!-- ================================================= -->
+      <!-- MOBILE MENU OVERLAY -->
+      <!-- ================================================= -->
+
+      <div
+        id="mobile-menu-overlay"
+        onclick="closeMobileMenu()"
+        class="mobile-overlay fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm lg:hidden"
+      ></div>
+
+      <!-- ================================================= -->
+      <!-- MOBILE MENU DRAWER -->
+      <!-- ================================================= -->
+
+      <aside
+        id="mobile-drawer"
+        class="mobile-drawer fixed right-0 top-0 z-[70] h-full w-[280px] border-l border-border bg-[#0D0D0F] p-5 shadow-2xl lg:hidden"
+      >
+        <!-- DRAWER HEADER -->
+
+        <div class="mb-10 flex items-center justify-between">
+          <button
+            onclick="navigateTo('dashboard')"
+            class="flex items-center gap-3 text-left"
+          >
+            <div
+              class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500 text-blue-50 shadow-glow"
+            >
+              <i data-lucide="dumbbell" class="h-5 w-5"></i>
+            </div>
+
+            <div>
+              <h2 class="text-sm font-bold">Workout Tracker</h2>
+
+              <p class="mt-0.5 text-[10px] text-zinc-500">
+                TRAIN • TRACK • IMPROVE
+              </p>
+            </div>
+          </button>
+
+          <button
+            onclick="closeMobileMenu()"
+            aria-label="Close navigation menu"
+            class="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-500 transition hover:bg-zinc-800 hover:text-white"
+          >
+            <i data-lucide="x" class="h-5 w-5"></i>
+          </button>
+        </div>
+
+        <!-- DRAWER NAVIGATION -->
+
+        <nav class="space-y-2">
+          <button
+            onclick="navigateTo('dashboard')"
+            class="mobile-menu-link flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 transition hover:bg-zinc-900 hover:text-white"
+          >
+            <i data-lucide="house" class="h-[18px] w-[18px]"></i>
+            Dashboard
+          </button>
+
+          <button
+            onclick="navigateTo('routine')"
+            class="mobile-menu-link flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 transition hover:bg-zinc-900 hover:text-white"
+          >
+            <i data-lucide="calendar-days" class="h-[18px] w-[18px]"></i>
+            My Routine
+          </button>
+
+          <button
+            onclick="navigateTo('workout')"
+            class="mobile-menu-link flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 transition hover:bg-zinc-900 hover:text-white"
+          >
+            <i data-lucide="play" class="h-[18px] w-[18px]"></i>
+            Start Workout
+          </button>
+
+          <button
+            onclick="navigateTo('history')"
+            class="mobile-menu-link flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 transition hover:bg-zinc-900 hover:text-white"
+          >
+            <i data-lucide="history" class="h-[18px] w-[18px]"></i>
+            History
+          </button>
+
+          <button
+            onclick="navigateTo('progress')"
+            class="mobile-menu-link flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 transition hover:bg-zinc-900 hover:text-white"
+          >
+            <i
+              data-lucide="chart-no-axes-combined"
+              class="h-[18px] w-[18px]"
+            ></i>
+            Progress
+          </button>
+
+          <button
+            onclick="navigateTo('settings')"
+            class="mobile-menu-link flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-400 transition hover:bg-zinc-900 hover:text-white"
+          >
+            <i data-lucide="settings" class="h-[18px] w-[18px]"></i>
+            Settings
+          </button>
+        </nav>
+
+        <!-- DRAWER FOOTER -->
+
+        <div
+          class="absolute bottom-6 left-5 right-5 rounded-2xl border border-border bg-card p-4"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/10 text-blue-400"
+            >
+              <i data-lucide="trending-up" class="h-4 w-4"></i>
+            </div>
+
+            <div>
+              <p class="text-xs font-semibold">Keep progressing</p>
+
+              <p class="mt-1 text-[10px] text-zinc-500">
+                Every session counts.
+              </p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ================================================= -->
+    <!-- JAVASCRIPT -->
+    <!-- ================================================= -->
+
+    <script>
+      /*
+       * ================================================
+       * PAGE NAVIGATION
+       * ================================================
+       */
+
+      function navigateTo(page) {
+        const validPages = [
+          "dashboard",
+          "routine",
+          "workout",
+          "history",
+          "progress",
+          "settings",
+        ];
+
+        if (!validPages.includes(page)) {
+          page = "dashboard";
+        }
+
+        // Hide every page
+
+        document.querySelectorAll(".page").forEach((section) => {
+          section.classList.remove("active");
+        });
+
+        // Show selected page
+
+        const selectedPage = document.getElementById(`page-${page}`);
+
+        if (selectedPage) {
+          selectedPage.classList.add("active");
+        }
+
+        // Update desktop navigation
+
+        document.querySelectorAll(".nav-item").forEach((item) => {
+          item.classList.remove("active");
+        });
+
+        const desktopItem = document.querySelector(
+          `.nav-item[data-page="${page}"]`,
+        );
+
+        if (desktopItem) {
+          desktopItem.classList.add("active");
+        }
+
+        // Update mobile bottom navigation
+
+        document.querySelectorAll(".mobile-nav-item").forEach((item) => {
+          item.classList.remove("active");
+        });
+
+        const mobileItem = document.querySelector(
+          `.mobile-nav-item[data-mobile-page="${page}"]`,
+        );
+
+        if (mobileItem) {
+          mobileItem.classList.add("active");
+        }
+
+        // Hide mobile workout button while already on workout page
+
+        const mobileWorkoutButton = document.getElementById(
+          "mobile-workout-button",
+        );
+
+        if (mobileWorkoutButton) {
+          if (page === "workout") {
+            mobileWorkoutButton.classList.add("hidden");
+          } else {
+            mobileWorkoutButton.classList.remove("hidden");
+          }
+        }
+
+        // Close mobile drawer
+
+        closeMobileMenu();
+
+        // Update browser URL
+
+        const currentHash = window.location.hash.replace("#", "");
+
+        if (currentHash !== page) {
+          history.pushState({ page: page }, "", `#${page}`);
+        }
+
+        // Scroll to top
+
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+
+        // Re-render Lucide icons
+
+        lucide.createIcons();
+      }
+
+      /*
+       * ================================================
+       * MOBILE MENU
+       * ================================================
+       */
+
+      function openMobileMenu() {
+        const drawer = document.getElementById("mobile-drawer");
+
+        const overlay = document.getElementById("mobile-menu-overlay");
+
+        if (!drawer || !overlay) {
+          return;
+        }
+
+        drawer.classList.add("open");
+        overlay.classList.add("open");
+
+        document.body.classList.add("overflow-hidden");
+      }
+
+      function closeMobileMenu() {
+        const drawer = document.getElementById("mobile-drawer");
+
+        const overlay = document.getElementById("mobile-menu-overlay");
+
+        if (!drawer || !overlay) {
+          return;
+        }
+
+        drawer.classList.remove("open");
+        overlay.classList.remove("open");
+
+        document.body.classList.remove("overflow-hidden");
+      }
+
+      /*
+       * ================================================
+       * ESCAPE KEY
+       * ================================================
+       */
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeMobileMenu();
+        }
+      });
+
+      /*
+       * ================================================
+       * INITIALIZE ICONS
+       * ================================================
+       */
+
+      lucide.createIcons();
+
+      /*
+       * ================================================
+       * BROWSER HISTORY
+       * ================================================
+       */
+
+      window.addEventListener("popstate", () => {
+        const page = window.location.hash.replace("#", "") || "dashboard";
+
+        navigateTo(page);
+      });
+
+      /*
+       * ================================================
+       * INITIAL PAGE
+       * ================================================
+       */
+
+      const initialPage = window.location.hash.replace("#", "") || "dashboard";
+
+      navigateTo(initialPage);
+    </script>
+  </body>
+</html>
