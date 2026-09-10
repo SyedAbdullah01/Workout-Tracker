@@ -623,6 +623,11 @@
         renderWorkoutSession();
       }
 
+      function goToRoutineEditor(dayKey) {
+        navigateTo("routine");
+        openDayEditor(dayKey);
+      }
+
       function renderWorkoutSession() {
         const day = currentRoutine[currentSession.dayKey];
         const dayLabelText = DAY_LABELS[currentSession.dayKey];
@@ -644,8 +649,15 @@
               </div>
               <h3 class="text-lg font-semibold text-zinc-300">Rest Day</h3>
               <p class="mt-2 text-sm text-zinc-500">
-                No workout scheduled for ${dayLabelText}. Pick another day above, or set one up in My Routine.
+                No workout scheduled for ${dayLabelText}.
               </p>
+              <button
+                onclick="goToRoutineEditor('${currentSession.dayKey}')"
+                class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-zinc-800 hover:text-white"
+              >
+                <i data-lucide="plus" class="h-4 w-4"></i>
+                Set Up ${dayLabelText}'s Workout
+              </button>
             </div>
           `;
 
@@ -838,29 +850,70 @@
         }
 
         listEl.innerHTML = history
-          .map((session) => {
-            const totalSets = session.exercises.reduce(
-              (sum, ex) => sum + ex.sets.length,
-              0,
-            );
+          .map((session, index) => renderHistoryEntry(session, index))
+          .join("");
+
+        lucide.createIcons();
+      }
+
+      function renderHistoryEntry(session, index) {
+        const totalSets = session.exercises.reduce(
+          (sum, ex) => sum + ex.sets.length,
+          0,
+        );
+
+        const exerciseDetails = session.exercises
+          .map((ex) => {
+            const setsText = ex.sets
+              .map((set, setIndex) => {
+                const weight =
+                  set.weight !== "" ? `${escapeHtml(set.weight)} kg` : "—";
+                const reps =
+                  set.reps !== "" ? `${escapeHtml(set.reps)} reps` : "—";
+
+                return `<span class="mr-4 inline-block">Set ${setIndex + 1}: ${weight} × ${reps}${set.done ? " ✓" : ""}</span>`;
+              })
+              .join("");
 
             return `
-              <div class="flex w-full items-center gap-4 rounded-xl p-4 text-left">
-                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400">
-                  <i data-lucide="dumbbell" class="h-5 w-5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                  <h3 class="text-sm font-medium">${escapeHtml(session.dayLabel)}</h3>
-                  <p class="mt-1 text-xs text-zinc-500">
-                    ${formatHistoryDate(session.date)} • ${session.exercises.length} exercises • ${totalSets} sets
-                  </p>
-                </div>
+              <div class="py-2">
+                <p class="text-sm font-medium text-zinc-300">${escapeHtml(ex.name)}</p>
+                <p class="mt-1 text-xs text-zinc-500">${setsText}</p>
               </div>
             `;
           })
           .join("");
 
-        lucide.createIcons();
+        return `
+          <div class="rounded-xl transition hover:bg-zinc-900">
+            <button
+              onclick="toggleHistoryDetail(${index})"
+              class="flex w-full items-center gap-4 p-4 text-left"
+            >
+              <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400">
+                <i data-lucide="dumbbell" class="h-5 w-5"></i>
+              </div>
+              <div class="min-w-0 flex-1">
+                <h3 class="text-sm font-medium">${escapeHtml(session.dayLabel)}</h3>
+                <p class="mt-1 text-xs text-zinc-500">
+                  ${formatHistoryDate(session.date)} • ${session.exercises.length} exercises • ${totalSets} sets
+                </p>
+              </div>
+              <i data-lucide="chevron-right" class="h-4 w-4 text-zinc-600"></i>
+            </button>
+            <div id="history-detail-${index}" class="hidden border-t border-border px-4 pb-4 pt-3">
+              ${exerciseDetails}
+            </div>
+          </div>
+        `;
+      }
+
+      function toggleHistoryDetail(index) {
+        const detail = document.getElementById(`history-detail-${index}`);
+
+        if (detail) {
+          detail.classList.toggle("hidden");
+        }
       }
 
       // Load the saved routine (or seed defaults) and render it immediately.
