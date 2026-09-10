@@ -80,6 +80,12 @@
           initWorkoutPage();
         }
 
+        // Render saved sessions whenever History is opened
+
+        if (page === "history") {
+          renderHistory();
+        }
+
         // Close mobile drawer
 
         closeMobileMenu();
@@ -744,6 +750,117 @@
             </td>
           </tr>
         `;
+      }
+
+      /*
+       * ================================================
+       * HISTORY (completed workout sessions)
+       * ================================================
+       */
+
+      const HISTORY_STORAGE_KEY = "workoutTracker.history";
+
+      function loadHistory() {
+        try {
+          const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+          return raw ? JSON.parse(raw) : [];
+        } catch (err) {
+          console.error("Failed to load workout history.", err);
+          return [];
+        }
+      }
+
+      function saveHistory(history) {
+        localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
+      }
+
+      function formatHistoryDate(isoDate) {
+        const date = new Date(`${isoDate}T00:00:00`);
+
+        return date.toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+      }
+
+      function finishWorkout() {
+        // Nothing to save (e.g. a rest day was showing) - just go to History.
+        if (!currentSession || currentSession.exercises.length === 0) {
+          navigateTo("history");
+          return;
+        }
+
+        const day = currentRoutine[currentSession.dayKey];
+
+        const completedSession = {
+          date: new Date().toISOString().slice(0, 10),
+          dayKey: currentSession.dayKey,
+          dayLabel: day.label,
+          exercises: currentSession.exercises.map((ex) => ({
+            name: ex.name,
+            sets: ex.sets.map((set) => ({ ...set })),
+          })),
+        };
+
+        const history = loadHistory();
+        history.unshift(completedSession);
+        saveHistory(history);
+
+        // Clear the in-memory session so the next visit to Start Workout
+        // loads a fresh one instead of showing what was just finished.
+        currentSession = null;
+        workoutPageInitialized = false;
+
+        navigateTo("history");
+      }
+
+      function renderHistory() {
+        const listEl = document.getElementById("history-list");
+
+        if (!listEl) {
+          return;
+        }
+
+        const history = loadHistory();
+
+        if (history.length === 0) {
+          listEl.innerHTML = `
+            <div class="p-8 text-center">
+              <p class="text-sm text-zinc-500">
+                No completed workouts yet. Finish a session from Start Workout and it'll show up here.
+              </p>
+            </div>
+          `;
+
+          lucide.createIcons();
+          return;
+        }
+
+        listEl.innerHTML = history
+          .map((session) => {
+            const totalSets = session.exercises.reduce(
+              (sum, ex) => sum + ex.sets.length,
+              0,
+            );
+
+            return `
+              <div class="flex w-full items-center gap-4 rounded-xl p-4 text-left">
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400">
+                  <i data-lucide="dumbbell" class="h-5 w-5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <h3 class="text-sm font-medium">${escapeHtml(session.dayLabel)}</h3>
+                  <p class="mt-1 text-xs text-zinc-500">
+                    ${formatHistoryDate(session.date)} • ${session.exercises.length} exercises • ${totalSets} sets
+                  </p>
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+
+        lucide.createIcons();
       }
 
       // Load the saved routine (or seed defaults) and render it immediately.
