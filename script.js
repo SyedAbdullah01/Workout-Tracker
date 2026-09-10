@@ -1,5 +1,4 @@
-
-      /*
+/*
        * ================================================
        * PAGE NAVIGATION
        * ================================================
@@ -73,6 +72,12 @@
           } else {
             mobileWorkoutButton.classList.remove("hidden");
           }
+        }
+
+        // Load the saved routine into the Start Workout page
+
+        if (page === "workout") {
+          initWorkoutPage();
         }
 
         // Close mobile drawer
@@ -492,6 +497,253 @@
           clearDay(editingDayKey);
           closeDayEditor();
         }
+      }
+
+      /*
+       * ================================================
+       * WORKOUT SESSION (Start Workout page)
+       * ================================================
+       */
+
+      let currentSession = null;
+      let workoutPageInitialized = false;
+
+      function getTodayDayKey() {
+        const jsDayToKey = [
+          "sunday",
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+        ];
+
+        return jsDayToKey[new Date().getDay()];
+      }
+
+      function initWorkoutPage() {
+        if (!workoutPageInitialized) {
+          loadWorkoutDay(getTodayDayKey());
+          workoutPageInitialized = true;
+        } else {
+          renderWorkoutSession();
+        }
+      }
+
+      function hasSessionProgress() {
+        if (!currentSession) {
+          return false;
+        }
+
+        return currentSession.exercises.some((ex) =>
+          ex.sets.some(
+            (set) => set.weight !== "" || set.reps !== "" || set.done,
+          ),
+        );
+      }
+
+      function loadWorkoutDay(dayKey) {
+        const day = currentRoutine[dayKey];
+
+        if (isRestDay(day)) {
+          currentSession = { dayKey, exercises: [] };
+        } else {
+          currentSession = {
+            dayKey,
+            exercises: day.exercises.map((ex) => ({
+              name: ex.name,
+              sets: Array.from({ length: ex.sets }, () => ({
+                weight: "",
+                reps: "",
+                done: false,
+              })),
+            })),
+          };
+        }
+
+        document.getElementById("workout-day-select").value = dayKey;
+        renderWorkoutSession();
+      }
+
+      function handleWorkoutDayChange(dayKey) {
+        if (hasSessionProgress()) {
+          const confirmed = confirm(
+            "Switch days? Any unsaved progress on the current session will be lost.",
+          );
+
+          if (!confirmed) {
+            document.getElementById("workout-day-select").value =
+              currentSession.dayKey;
+            return;
+          }
+        }
+
+        loadWorkoutDay(dayKey);
+      }
+
+      function resetWorkoutSession() {
+        if (!currentSession) {
+          return;
+        }
+
+        const confirmed = confirm(
+          "Reset this session? All entered weights, reps, and completed sets will be cleared.",
+        );
+
+        if (confirmed) {
+          loadWorkoutDay(currentSession.dayKey);
+        }
+      }
+
+      function updateWorkoutSet(exIndex, setIndex, field, value) {
+        currentSession.exercises[exIndex].sets[setIndex][field] = value;
+      }
+
+      function toggleSetDone(exIndex, setIndex) {
+        const set = currentSession.exercises[exIndex].sets[setIndex];
+
+        set.done = !set.done;
+        renderWorkoutSession();
+      }
+
+      function addWorkoutSet(exIndex) {
+        currentSession.exercises[exIndex].sets.push({
+          weight: "",
+          reps: "",
+          done: false,
+        });
+
+        renderWorkoutSession();
+      }
+
+      function renderWorkoutSession() {
+        const day = currentRoutine[currentSession.dayKey];
+        const dayLabelText = DAY_LABELS[currentSession.dayKey];
+        const titleEl = document.getElementById("workout-day-title");
+        const subtitleEl = document.getElementById("workout-day-subtitle");
+        const listEl = document.getElementById("workout-exercise-list");
+        const finishContainer = document.getElementById(
+          "finish-workout-container",
+        );
+
+        if (isRestDay(day) || currentSession.exercises.length === 0) {
+          titleEl.textContent = "Rest Day";
+          subtitleEl.textContent = `${dayLabelText} • No workout scheduled`;
+
+          listEl.innerHTML = `
+            <div class="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
+              <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-800 text-zinc-500">
+                <i data-lucide="moon" class="h-6 w-6"></i>
+              </div>
+              <h3 class="text-lg font-semibold text-zinc-300">Rest Day</h3>
+              <p class="mt-2 text-sm text-zinc-500">
+                No workout scheduled for ${dayLabelText}. Pick another day above, or set one up in My Routine.
+              </p>
+            </div>
+          `;
+
+          if (finishContainer) {
+            finishContainer.classList.add("hidden");
+          }
+
+          lucide.createIcons();
+          return;
+        }
+
+        const totalSets = currentSession.exercises.reduce(
+          (sum, ex) => sum + ex.sets.length,
+          0,
+        );
+
+        titleEl.textContent = day.label;
+        subtitleEl.textContent = `${dayLabelText} • ${currentSession.exercises.length} exercises • ${totalSets} sets`;
+
+        listEl.innerHTML = currentSession.exercises
+          .map((ex, exIndex) => renderExerciseCard(ex, exIndex))
+          .join("");
+
+        if (finishContainer) {
+          finishContainer.classList.remove("hidden");
+        }
+
+        lucide.createIcons();
+      }
+
+      function renderExerciseCard(exercise, exIndex) {
+        const rows = exercise.sets
+          .map((set, setIndex) => renderSetRow(set, exIndex, setIndex))
+          .join("");
+
+        return `
+          <section class="mb-5 rounded-2xl border border-border bg-card p-5 sm:p-6">
+            <div class="mb-5 flex items-center justify-between">
+              <div>
+                <p class="text-xs uppercase tracking-wider text-blue-400">Exercise ${exIndex + 1}</p>
+                <h3 class="mt-1 text-lg font-semibold">${escapeHtml(exercise.name)}</h3>
+              </div>
+              <span class="text-xs text-zinc-500"> ${exercise.sets.length} sets </span>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full min-w-[420px] text-left">
+                <thead>
+                  <tr class="border-b border-border text-xs text-zinc-500">
+                    <th class="pb-3 font-medium">Set</th>
+                    <th class="pb-3 font-medium">Weight</th>
+                    <th class="pb-3 font-medium">Reps</th>
+                    <th class="pb-3 text-right font-medium">Done</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rows}
+                </tbody>
+              </table>
+            </div>
+
+            <button onclick="addWorkoutSet(${exIndex})" class="mt-4 flex items-center gap-2 text-xs font-medium text-zinc-500 transition hover:text-zinc-300">
+              <i data-lucide="plus" class="h-4 w-4"></i>
+              Add Set
+            </button>
+          </section>
+        `;
+      }
+
+      function renderSetRow(set, exIndex, setIndex) {
+        const doneColor = set.done ? "text-emerald-400" : "text-zinc-600";
+        const doneIcon = set.done ? "check-circle-2" : "circle";
+
+        return `
+          <tr class="border-b border-border last:border-0">
+            <td class="py-3 text-sm text-zinc-400">${setIndex + 1}</td>
+            <td class="py-3">
+              <div class="flex items-center gap-2">
+                <input
+                  type="number"
+                  value="${escapeHtml(set.weight)}"
+                  placeholder="Weight"
+                  oninput="updateWorkoutSet(${exIndex}, ${setIndex}, 'weight', this.value)"
+                  class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+                />
+                <span class="text-xs text-zinc-500"> kg </span>
+              </div>
+            </td>
+            <td class="py-3">
+              <input
+                type="number"
+                value="${escapeHtml(set.reps)}"
+                placeholder="Reps"
+                oninput="updateWorkoutSet(${exIndex}, ${setIndex}, 'reps', this.value)"
+                class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
+              />
+            </td>
+            <td class="py-3 text-right">
+              <button onclick="toggleSetDone(${exIndex}, ${setIndex})" class="${doneColor}">
+                <i data-lucide="${doneIcon}" class="h-5 w-5"></i>
+              </button>
+            </td>
+          </tr>
+        `;
       }
 
       // Load the saved routine (or seed defaults) and render it immediately.

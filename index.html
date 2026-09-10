@@ -272,6 +272,7 @@
               <i data-lucide="play" class="h-4 w-4"></i>
               Start Workout
             </button>
+
           </header>
 
           <!-- MOBILE STATS -->
@@ -644,454 +645,46 @@
               <div>
                 <p class="text-xs text-zinc-500">Today's routine</p>
 
-                <h3 class="mt-1 text-xl font-semibold">Push Day</h3>
+                <h3 id="workout-day-title" class="mt-1 text-xl font-semibold">
+                  Push Day
+                </h3>
 
-                <p class="mt-1 text-sm text-zinc-500">
+                <p id="workout-day-subtitle" class="mt-1 text-sm text-zinc-500">
                   Monday • 5 exercises • 15 sets
                 </p>
               </div>
 
-              <button
-                class="flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-zinc-800"
-              >
-                <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
-                Reset
-              </button>
-            </div>
-          </section>
+              <div class="flex items-center gap-3">
+                <select
+                  id="workout-day-select"
+                  onchange="handleWorkoutDayChange(this.value)"
+                  class="rounded-xl border border-border bg-[#101012] px-4 py-2.5 text-sm text-zinc-300"
+                >
+                  <option value="monday">Monday</option>
+                  <option value="tuesday">Tuesday</option>
+                  <option value="wednesday">Wednesday</option>
+                  <option value="thursday">Thursday</option>
+                  <option value="friday">Friday</option>
+                  <option value="saturday">Saturday</option>
+                  <option value="sunday">Sunday</option>
+                </select>
 
-          <!-- ================================================= -->
-          <!-- EXERCISE 1 -->
-          <!-- ================================================= -->
-
-          <section
-            class="mb-5 rounded-2xl border border-border bg-card p-5 sm:p-6"
-          >
-            <div class="mb-5 flex items-center justify-between">
-              <div>
-                <p class="text-xs uppercase tracking-wider text-blue-400">
-                  Exercise 1
-                </p>
-
-                <h3 class="mt-1 text-lg font-semibold">Bench Press</h3>
+                <button
+                  onclick="resetWorkoutSession()"
+                  class="flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-zinc-800"
+                >
+                  <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
+                  Reset
+                </button>
               </div>
-
-              <span class="text-xs text-zinc-500"> 3 sets </span>
             </div>
-
-            <div class="overflow-x-auto">
-              <table class="w-full min-w-[420px] text-left">
-                <thead>
-                  <tr class="border-b border-border text-xs text-zinc-500">
-                    <th class="pb-3 font-medium">Set</th>
-
-                    <th class="pb-3 font-medium">Weight</th>
-
-                    <th class="pb-3 font-medium">Reps</th>
-
-                    <th class="pb-3 text-right font-medium">Done</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  <!-- SET 1 -->
-
-                  <tr class="border-b border-border">
-                    <td class="py-3 text-sm text-zinc-400">1</td>
-
-                    <td class="py-3">
-                      <div class="flex items-center gap-2">
-                        <input
-                          type="number"
-                          value="60"
-                          class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
-                        />
-
-                        <span class="text-xs text-zinc-500"> kg </span>
-                      </div>
-                    </td>
-
-                    <td class="py-3">
-                      <input
-                        type="number"
-                        value="10"
-                        class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
-                      />
-                    </td>
-
-                    <td class="py-3 text-right">
-                      <button class="text-emerald-400">
-                        <i data-lucide="check-circle-2" class="h-5 w-5"></i>
-                      </button>
-                    </td>
-                  </tr>
-
-                  <!-- SET 2 -->
-
-                  <tr class="border-b border-border">
-                    <td class="py-3 text-sm text-zinc-400">2</td>
-
-                    <td class="py-3">
-                      <div class="flex items-center gap-2">
-                        <input
-                          type="number"
-                          value="60"
-                          class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
-                        />
-
-                        <span class="text-xs text-zinc-500"> kg </span>
-                      </div>
-                    </td>
-
-                    <td class="py-3">
-                      <input
-                        type="number"
-                        value="9"
-                        class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
-                      />
-                    </td>
-
-                    <td class="py-3 text-right">
-                      <button class="text-zinc-600">
-                        <i data-lucide="circle" class="h-5 w-5"></i>
-                      </button>
-                    </td>
-                  </tr>
-
-                  <!-- SET 3 -->
-
-                  <tr>
-                    <td class="py-3 text-sm text-zinc-400">3</td>
-
-                    <td class="py-3">
-                      <div class="flex items-center gap-2">
-                        <input
-                          type="number"
-                          value="60"
-                          class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
-                        />
-
-                        <span class="text-xs text-zinc-500"> kg </span>
-                      </div>
-                    </td>
-
-                    <td class="py-3">
-                      <input
-                        type="number"
-                        value="8"
-                        class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
-                      />
-                    </td>
-
-                    <td class="py-3 text-right">
-                      <button class="text-zinc-600">
-                        <i data-lucide="circle" class="h-5 w-5"></i>
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <button
-              class="mt-4 flex items-center gap-2 text-xs font-medium text-zinc-500 transition hover:text-zinc-300"
-            >
-              <i data-lucide="plus" class="h-4 w-4"></i>
-              Add Set
-            </button>
           </section>
 
-          <!-- ================================================= -->
-          <!-- EXERCISE 2 -->
-          <!-- ================================================= -->
-
-          <section
-            class="mb-5 rounded-2xl border border-border bg-card p-5 sm:p-6"
-          >
-            <div class="mb-5 flex items-center justify-between">
-              <div>
-                <p class="text-xs uppercase tracking-wider text-blue-400">
-                  Exercise 2
-                </p>
-
-                <h3 class="mt-1 text-lg font-semibold">
-                  Incline Dumbbell Press
-                </h3>
-              </div>
-
-              <span class="text-xs text-zinc-500"> 3 sets </span>
-            </div>
-
-            <!-- SAME TABLE STRUCTURE AS EXERCISE 1 -->
-
-            <div class="overflow-x-auto">
-              <table class="w-full min-w-[420px] text-left">
-                <thead>
-                  <tr class="border-b border-border text-xs text-zinc-500">
-                    <th class="pb-3 font-medium">Set</th>
-
-                    <th class="pb-3 font-medium">Weight</th>
-
-                    <th class="pb-3 font-medium">Reps</th>
-
-                    <th class="pb-3 text-right font-medium">Done</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  <!-- SET 1 -->
-
-                  <tr class="border-b border-border">
-                    <td class="py-3 text-sm text-zinc-400">1</td>
-
-                    <td class="py-3">
-                      <div class="flex items-center gap-2">
-                        <input
-                          type="number"
-                          value="20"
-                          class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
-                        />
-
-                        <span class="text-xs text-zinc-500"> kg </span>
-                      </div>
-                    </td>
-
-                    <td class="py-3">
-                      <input
-                        type="number"
-                        value="12"
-                        class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
-                      />
-                    </td>
-
-                    <td class="py-3 text-right">
-                      <button class="text-emerald-400">
-                        <i data-lucide="check-circle-2" class="h-5 w-5"></i>
-                      </button>
-                    </td>
-                  </tr>
-
-                  <!-- SET 2 -->
-
-                  <tr class="border-b border-border">
-                    <td class="py-3 text-sm text-zinc-400">2</td>
-
-                    <td class="py-3">
-                      <div class="flex items-center gap-2">
-                        <input
-                          type="number"
-                          value="20"
-                          class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
-                        />
-
-                        <span class="text-xs text-zinc-500"> kg </span>
-                      </div>
-                    </td>
-
-                    <td class="py-3">
-                      <input
-                        type="number"
-                        value="10"
-                        class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
-                      />
-                    </td>
-
-                    <td class="py-3 text-right">
-                      <button class="text-emerald-400">
-                        <i data-lucide="check-circle-2" class="h-5 w-5"></i>
-                      </button>
-                    </td>
-                  </tr>
-
-                  <!-- SET 3 -->
-
-                  <tr>
-                    <td class="py-3 text-sm text-zinc-400">3</td>
-
-                    <td class="py-3">
-                      <div class="flex items-center gap-2">
-                        <input
-                          type="number"
-                          value="20"
-                          class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
-                        />
-
-                        <span class="text-xs text-zinc-500"> kg </span>
-                      </div>
-                    </td>
-
-                    <td class="py-3">
-                      <input
-                        type="number"
-                        value="9"
-                        class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
-                      />
-                    </td>
-
-                    <td class="py-3 text-right">
-                      <button class="text-zinc-600">
-                        <i data-lucide="circle" class="h-5 w-5"></i>
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <button
-              class="mt-4 flex items-center gap-2 text-xs font-medium text-zinc-500 transition hover:text-zinc-300"
-            >
-              <i data-lucide="plus" class="h-4 w-4"></i>
-              Add Set
-            </button>
-          </section>
-
-          <!-- ================================================= -->
-          <!-- EXERCISE 3 -->
-          <!-- ================================================= -->
-
-          <section
-            class="mb-5 rounded-2xl border border-border bg-card p-5 sm:p-6"
-          >
-            <div class="mb-5 flex items-center justify-between">
-              <div>
-                <p class="text-xs uppercase tracking-wider text-blue-400">
-                  Exercise 3
-                </p>
-
-                <h3 class="mt-1 text-lg font-semibold">Shoulder Press</h3>
-              </div>
-
-              <span class="text-xs text-zinc-500"> 3 sets </span>
-            </div>
-
-            <!-- SAME TABLE STRUCTURE AS EXERCISES 1 AND 2 -->
-
-            <div class="overflow-x-auto">
-              <table class="w-full min-w-[420px] text-left">
-                <thead>
-                  <tr class="border-b border-border text-xs text-zinc-500">
-                    <th class="pb-3 font-medium">Set</th>
-
-                    <th class="pb-3 font-medium">Weight</th>
-
-                    <th class="pb-3 font-medium">Reps</th>
-
-                    <th class="pb-3 text-right font-medium">Done</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  <!-- SET 1 -->
-
-                  <tr class="border-b border-border">
-                    <td class="py-3 text-sm text-zinc-400">1</td>
-
-                    <td class="py-3">
-                      <div class="flex items-center gap-2">
-                        <input
-                          type="number"
-                          class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
-                          placeholder="Weight"
-                        />
-
-                        <span class="text-xs text-zinc-500"> kg </span>
-                      </div>
-                    </td>
-
-                    <td class="py-3">
-                      <input
-                        type="number"
-                        class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
-                        placeholder="Reps"
-                      />
-                    </td>
-
-                    <td class="py-3 text-right">
-                      <button class="text-zinc-600">
-                        <i data-lucide="circle" class="h-5 w-5"></i>
-                      </button>
-                    </td>
-                  </tr>
-
-                  <!-- SET 2 -->
-
-                  <tr class="border-b border-border">
-                    <td class="py-3 text-sm text-zinc-400">2</td>
-
-                    <td class="py-3">
-                      <div class="flex items-center gap-2">
-                        <input
-                          type="number"
-                          class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
-                          placeholder="Weight"
-                        />
-
-                        <span class="text-xs text-zinc-500"> kg </span>
-                      </div>
-                    </td>
-
-                    <td class="py-3">
-                      <input
-                        type="number"
-                        class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
-                        placeholder="Reps"
-                      />
-                    </td>
-
-                    <td class="py-3 text-right">
-                      <button class="text-zinc-600">
-                        <i data-lucide="circle" class="h-5 w-5"></i>
-                      </button>
-                    </td>
-                  </tr>
-
-                  <!-- SET 3 -->
-
-                  <tr>
-                    <td class="py-3 text-sm text-zinc-400">3</td>
-
-                    <td class="py-3">
-                      <div class="flex items-center gap-2">
-                        <input
-                          type="number"
-                          class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
-                          placeholder="Weight"
-                        />
-
-                        <span class="text-xs text-zinc-500"> kg </span>
-                      </div>
-                    </td>
-
-                    <td class="py-3">
-                      <input
-                        type="number"
-                        class="w-20 rounded-lg border border-border bg-[#101012] px-3 py-2 text-sm"
-                        placeholder="Reps"
-                      />
-                    </td>
-
-                    <td class="py-3 text-right">
-                      <button class="text-zinc-600">
-                        <i data-lucide="circle" class="h-5 w-5"></i>
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <button
-              class="mt-4 flex items-center gap-2 text-xs font-medium text-zinc-500 transition hover:text-zinc-300"
-            >
-              <i data-lucide="plus" class="h-4 w-4"></i>
-              Add Set
-            </button>
-          </section>
+          <div id="workout-exercise-list"></div>
 
           <!-- FINISH -->
 
-          <div class="sticky bottom-20 z-20 mt-6 lg:bottom-4">
+          <div id="finish-workout-container" class="sticky bottom-20 z-20 mt-6 lg:bottom-4">
             <button
               onclick="navigateTo('history')"
               class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 py-4 text-sm font-semibold shadow-lg shadow-blue-500/20 transition hover:bg-blue-400"
