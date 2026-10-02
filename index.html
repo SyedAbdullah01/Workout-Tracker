@@ -33,63 +33,7 @@
       };
     </script>
 
-    <style>
-      html {
-        scroll-behavior: smooth;
-      }
-
-      body {
-        min-height: 100vh;
-      }
-
-      .nav-item.active {
-        background: rgba(59, 130, 246, 0.12);
-        color: #60a5fa;
-      }
-
-      .mobile-nav-item.active {
-        color: #60a5fa;
-      }
-
-      .page {
-        display: none;
-      }
-
-      .page.active {
-        display: block;
-      }
-
-      input,
-      select {
-        outline: none;
-      }
-
-      input:focus,
-      select:focus {
-        border-color: rgba(59, 130, 246, 0.7);
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
-      }
-
-      .mobile-drawer {
-        transform: translateX(100%);
-        transition: transform 0.25s ease;
-      }
-
-      .mobile-drawer.open {
-        transform: translateX(0);
-      }
-
-      .mobile-overlay {
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.25s ease;
-      }
-
-      .mobile-overlay.open {
-        opacity: 1;
-        pointer-events: auto;
-      }
-    </style>
+    <link rel="stylesheet" href="styles.css" />
   </head>
 
   <body class="bg-background text-white antialiased">
@@ -251,12 +195,16 @@
           <header class="mb-8 flex items-center justify-between">
             <div>
               <p
+                id="dashboard-date"
                 class="mb-2 text-xs font-medium uppercase tracking-[0.2em] text-blue-400"
               >
                 Wednesday, September 9
               </p>
 
-              <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+              <h2
+                id="dashboard-greeting"
+                class="text-2xl font-bold tracking-tight sm:text-3xl"
+              >
                 Good morning, Abdullah
               </h2>
 
@@ -272,39 +220,33 @@
               <i data-lucide="play" class="h-4 w-4"></i>
               Start Workout
             </button>
-
           </header>
 
           <!-- MOBILE STATS -->
 
           <section class="mb-8 lg:hidden">
-            <div class="grid grid-cols-3 gap-2">
+            <div class="grid grid-cols-2 gap-2">
               <div
                 class="rounded-xl border border-border bg-gradient-to-br from-blue-500/20 to-blue-900/10 p-3 text-center"
               >
-                <p class="text-xl font-bold">12</p>
+                <p id="dashboard-stat-workouts" class="text-xl font-bold">
+                  12
+                </p>
                 <p class="mt-1 text-[10px] text-zinc-400">Workouts</p>
               </div>
 
               <div
                 class="rounded-xl border border-border bg-gradient-to-br from-emerald-500/20 to-emerald-900/10 p-3 text-center"
               >
-                <p class="text-xl font-bold">48</p>
+                <p id="dashboard-stat-sets" class="text-xl font-bold">48</p>
                 <p class="mt-1 text-[10px] text-zinc-400">Sets</p>
-              </div>
-
-              <div
-                class="rounded-xl border border-border bg-gradient-to-br from-purple-500/20 to-purple-900/10 p-3 text-center"
-              >
-                <p class="text-xl font-bold">5.4k</p>
-                <p class="mt-1 text-[10px] text-zinc-400">Volume</p>
               </div>
             </div>
           </section>
 
           <!-- DESKTOP STATS -->
 
-          <section class="mb-8 hidden grid-cols-1 gap-5 md:grid-cols-3 lg:grid">
+          <section class="mb-8 hidden grid-cols-1 gap-5 md:grid-cols-2 lg:grid">
             <div
               class="rounded-2xl border border-border bg-card p-6 transition hover:border-blue-500/40"
             >
@@ -312,7 +254,9 @@
                 <div>
                   <p class="text-sm text-zinc-500">Total Workouts</p>
 
-                  <h3 class="mt-3 text-3xl font-bold">12</h3>
+                  <h3 id="dashboard-stat-workouts-desktop" class="mt-3 text-3xl font-bold">
+                    12
+                  </h3>
 
                   <p class="mt-2 text-xs text-zinc-500">This month</p>
                 </div>
@@ -332,7 +276,9 @@
                 <div>
                   <p class="text-sm text-zinc-500">Total Sets</p>
 
-                  <h3 class="mt-3 text-3xl font-bold">48</h3>
+                  <h3 id="dashboard-stat-sets-desktop" class="mt-3 text-3xl font-bold">
+                    48
+                  </h3>
 
                   <p class="mt-2 text-xs text-zinc-500">This month</p>
                 </div>
@@ -341,26 +287,6 @@
                   class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/15 text-purple-400"
                 >
                   <i data-lucide="target" class="h-5 w-5"></i>
-                </div>
-              </div>
-            </div>
-
-            <div
-              class="rounded-2xl border border-border bg-card p-6 transition hover:border-blue-500/40"
-            >
-              <div class="flex items-start justify-between">
-                <div>
-                  <p class="text-sm text-zinc-500">Total Volume</p>
-
-                  <h3 class="mt-3 text-3xl font-bold">5,420 kg</h3>
-
-                  <p class="mt-2 text-xs text-zinc-500">This month</p>
-                </div>
-
-                <div
-                  class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400"
-                >
-                  <i data-lucide="chart-column" class="h-5 w-5"></i>
                 </div>
               </div>
             </div>
@@ -382,17 +308,18 @@
                     Today's Workout
                   </span>
 
-                  <span class="text-xs text-zinc-500"> Wednesday </span>
+                  <span class="text-xs text-zinc-500" id="dashboard-today-badge-day"> Wednesday </span>
                 </div>
 
-                <h3 class="text-xl font-semibold">Rest Day</h3>
+                <h3 id="dashboard-today-title" class="text-xl font-semibold">Rest Day</h3>
 
-                <p class="mt-2 text-sm text-zinc-500">
+                <p id="dashboard-today-desc" class="mt-2 text-sm text-zinc-500">
                   Recovery day. Your next workout is Thursday.
                 </p>
               </div>
 
               <div
+                id="dashboard-today-icon-wrap"
                 class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-zinc-900/60 text-zinc-500"
               >
                 <i data-lucide="moon" class="h-6 w-6"></i>
@@ -414,45 +341,51 @@
 
               <div class="mt-8 flex items-end justify-between gap-3">
                 <div class="flex flex-1 flex-col items-center gap-3">
-                  <div class="h-24 w-full rounded-lg bg-blue-500/20">
-                    <div class="h-[85%] w-full rounded-lg bg-blue-500"></div>
+                  <div id="dashboard-bar-track-monday" class="h-24 w-full rounded-lg bg-blue-500/20">
+                    <div id="dashboard-bar-fill-monday" class="h-[85%] w-full rounded-lg bg-blue-500"></div>
                   </div>
                   <span class="text-xs text-zinc-500">Mon</span>
                 </div>
 
                 <div class="flex flex-1 flex-col items-center gap-3">
-                  <div class="h-24 w-full rounded-lg bg-emerald-500/20">
-                    <div class="h-[90%] w-full rounded-lg bg-emerald-500"></div>
+                  <div id="dashboard-bar-track-tuesday" class="h-24 w-full rounded-lg bg-emerald-500/20">
+                    <div id="dashboard-bar-fill-tuesday" class="h-[90%] w-full rounded-lg bg-emerald-500"></div>
                   </div>
                   <span class="text-xs text-zinc-500">Tue</span>
                 </div>
 
                 <div class="flex flex-1 flex-col items-center gap-3">
-                  <div class="h-24 w-full rounded-lg bg-zinc-800">
-                    <div class="h-0 w-full rounded-lg bg-zinc-600"></div>
+                  <div id="dashboard-bar-track-wednesday" class="h-24 w-full rounded-lg bg-zinc-800">
+                    <div id="dashboard-bar-fill-wednesday" class="h-0 w-full rounded-lg bg-zinc-600"></div>
                   </div>
                   <span class="text-xs text-zinc-500">Wed</span>
                 </div>
 
                 <div class="flex flex-1 flex-col items-center gap-3">
-                  <div class="h-24 w-full rounded-lg bg-purple-500/20">
-                    <div class="h-[70%] w-full rounded-lg bg-purple-500"></div>
+                  <div id="dashboard-bar-track-thursday" class="h-24 w-full rounded-lg bg-purple-500/20">
+                    <div id="dashboard-bar-fill-thursday" class="h-[70%] w-full rounded-lg bg-purple-500"></div>
                   </div>
                   <span class="text-xs text-zinc-500">Thu</span>
                 </div>
 
                 <div class="flex flex-1 flex-col items-center gap-3">
-                  <div class="h-24 w-full rounded-lg bg-zinc-800"></div>
+                  <div id="dashboard-bar-track-friday" class="h-24 w-full rounded-lg bg-zinc-800">
+                    <div id="dashboard-bar-fill-friday" class="h-0 w-full rounded-lg bg-zinc-600"></div>
+                  </div>
                   <span class="text-xs text-zinc-500">Fri</span>
                 </div>
 
                 <div class="flex flex-1 flex-col items-center gap-3">
-                  <div class="h-24 w-full rounded-lg bg-zinc-800"></div>
+                  <div id="dashboard-bar-track-saturday" class="h-24 w-full rounded-lg bg-zinc-800">
+                    <div id="dashboard-bar-fill-saturday" class="h-0 w-full rounded-lg bg-zinc-600"></div>
+                  </div>
                   <span class="text-xs text-zinc-500">Sat</span>
                 </div>
 
                 <div class="flex flex-1 flex-col items-center gap-3">
-                  <div class="h-24 w-full rounded-lg bg-zinc-800"></div>
+                  <div id="dashboard-bar-track-sunday" class="h-24 w-full rounded-lg bg-zinc-800">
+                    <div id="dashboard-bar-fill-sunday" class="h-0 w-full rounded-lg bg-zinc-600"></div>
+                  </div>
                   <span class="text-xs text-zinc-500">Sun</span>
                 </div>
               </div>
@@ -480,79 +413,7 @@
                 </button>
               </div>
 
-              <div class="divide-y divide-border">
-                <button
-                  onclick="navigateTo('history')"
-                  class="flex w-full items-center gap-4 py-4 text-left first:pt-0"
-                >
-                  <div
-                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400"
-                  >
-                    <i data-lucide="dumbbell" class="h-5 w-5"></i>
-                  </div>
-
-                  <div class="min-w-0 flex-1">
-                    <h4 class="truncate text-sm font-medium">Push Day</h4>
-
-                    <p class="mt-1 text-xs text-zinc-500">
-                      September 8 • 52 min
-                    </p>
-                  </div>
-
-                  <i
-                    data-lucide="chevron-right"
-                    class="h-4 w-4 text-zinc-600"
-                  ></i>
-                </button>
-
-                <button
-                  onclick="navigateTo('history')"
-                  class="flex w-full items-center gap-4 py-4 text-left"
-                >
-                  <div
-                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-purple-500/15 text-purple-400"
-                  >
-                    <i data-lucide="footprints" class="h-5 w-5"></i>
-                  </div>
-
-                  <div class="min-w-0 flex-1">
-                    <h4 class="truncate text-sm font-medium">Leg Day</h4>
-
-                    <p class="mt-1 text-xs text-zinc-500">
-                      September 6 • 58 min
-                    </p>
-                  </div>
-
-                  <i
-                    data-lucide="chevron-right"
-                    class="h-4 w-4 text-zinc-600"
-                  ></i>
-                </button>
-
-                <button
-                  onclick="navigateTo('history')"
-                  class="flex w-full items-center gap-4 py-4 text-left"
-                >
-                  <div
-                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400"
-                  >
-                    <i data-lucide="activity" class="h-5 w-5"></i>
-                  </div>
-
-                  <div class="min-w-0 flex-1">
-                    <h4 class="truncate text-sm font-medium">Pull Day</h4>
-
-                    <p class="mt-1 text-xs text-zinc-500">
-                      September 4 • 48 min
-                    </p>
-                  </div>
-
-                  <i
-                    data-lucide="chevron-right"
-                    class="h-4 w-4 text-zinc-600"
-                  ></i>
-                </button>
-              </div>
+              <div id="dashboard-recent-workouts" class="divide-y divide-border"></div>
             </section>
           </div>
         </section>
@@ -676,7 +537,10 @@
 
           <!-- FINISH -->
 
-          <div id="finish-workout-container" class="sticky bottom-20 z-20 mt-6 lg:bottom-4">
+          <div
+            id="finish-workout-container"
+            class="sticky bottom-20 z-20 mt-6 lg:bottom-4"
+          >
             <button
               onclick="finishWorkout()"
               class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 py-4 text-sm font-semibold shadow-lg shadow-blue-500/20 transition hover:bg-blue-400"
@@ -781,77 +645,26 @@
             </label>
 
             <select
+              id="progress-exercise-select"
+              onchange="handleProgressExerciseChange(this.value)"
               class="mt-2 w-full rounded-xl border border-border bg-[#101012] px-4 py-3 text-sm text-zinc-300 sm:max-w-sm"
-            >
-              <option>Bench Press</option>
-
-              <option>Incline Dumbbell Press</option>
-
-              <option>Shoulder Press</option>
-
-              <option>Squat</option>
-
-              <option>Lat Pulldown</option>
-            </select>
+            ></select>
           </section>
 
           <!-- CHART -->
 
           <section class="rounded-2xl border border-border bg-card p-5 sm:p-6">
             <div class="mb-6">
-              <h3 class="text-lg font-semibold">Bench Press</h3>
+              <h3 id="progress-exercise-title" class="text-lg font-semibold">
+                Bench Press
+              </h3>
 
               <p class="mt-1 text-sm text-zinc-500">
                 Weight progression over your completed sessions
               </p>
             </div>
 
-            <div
-              class="relative h-64 overflow-hidden rounded-xl border border-border bg-[#101012]"
-            >
-              <div
-                class="absolute inset-0 flex flex-col justify-between p-6 opacity-20"
-              >
-                <div class="border-t border-zinc-600"></div>
-                <div class="border-t border-zinc-600"></div>
-                <div class="border-t border-zinc-600"></div>
-                <div class="border-t border-zinc-600"></div>
-                <div class="border-t border-zinc-600"></div>
-              </div>
-
-              <svg
-                class="absolute inset-0 h-full w-full"
-                viewBox="0 0 700 300"
-                preserveAspectRatio="none"
-              >
-                <polyline
-                  points="30,240 140,210 250,220 360,170 470,155 580,105 680,70"
-                  fill="none"
-                  stroke="#3B82F6"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-
-                <circle cx="30" cy="240" r="5" fill="#3B82F6"></circle>
-                <circle cx="140" cy="210" r="5" fill="#3B82F6"></circle>
-                <circle cx="250" cy="220" r="5" fill="#3B82F6"></circle>
-                <circle cx="360" cy="170" r="5" fill="#3B82F6"></circle>
-                <circle cx="470" cy="155" r="5" fill="#3B82F6"></circle>
-                <circle cx="580" cy="105" r="5" fill="#3B82F6"></circle>
-                <circle cx="680" cy="70" r="5" fill="#3B82F6"></circle>
-              </svg>
-            </div>
-
-            <div class="mt-4 flex justify-between text-xs text-zinc-600">
-              <span> Aug 1 </span>
-
-              <span> Aug 15 </span>
-
-              <span> Sep 1 </span>
-
-              <span> Sep 8 </span>
-            </div>
+            <div id="progress-chart-body"></div>
           </section>
         </section>
 
@@ -901,8 +714,9 @@
                   </label>
 
                   <input
+                    id="settings-name-input"
+                    onchange="saveProfileName(this.value)"
                     type="text"
-                    value="Abdullah"
                     class="mt-2 w-full rounded-xl border border-border bg-[#101012] px-4 py-3 text-sm"
                   />
                 </div>
@@ -934,6 +748,7 @@
 
               <div class="mt-6 flex flex-col gap-3 sm:flex-row">
                 <button
+                  onclick="exportData()"
                   class="flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-3 text-sm font-medium text-zinc-300 transition hover:bg-zinc-800"
                 >
                   <i data-lucide="download" class="h-4 w-4"></i>
@@ -941,6 +756,7 @@
                 </button>
 
                 <button
+                  onclick="clearAllData()"
                   class="flex items-center justify-center gap-2 rounded-xl border border-red-500/20 px-4 py-3 text-sm font-medium text-red-400 transition hover:bg-red-500/10"
                 >
                   <i data-lucide="trash-2" class="h-4 w-4"></i>
