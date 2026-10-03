@@ -577,34 +577,30 @@
           <section class="mb-6 rounded-2xl border border-border bg-card p-4">
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <select
+                id="history-filter-name"
+                onchange="handleHistoryFilterChange()"
                 class="rounded-xl border border-border bg-[#101012] px-4 py-3 text-sm text-zinc-300"
               >
-                <option>All Workouts</option>
-
-                <option>Push Day</option>
-
-                <option>Pull Day</option>
-
-                <option>Leg Day</option>
+                <option value="all">All Workouts</option>
               </select>
 
               <select
+                id="history-filter-range"
+                onchange="handleHistoryFilterChange()"
                 class="rounded-xl border border-border bg-[#101012] px-4 py-3 text-sm text-zinc-300"
               >
-                <option>All Time</option>
-
-                <option>This Month</option>
-
-                <option>Last 3 Months</option>
-
-                <option>This Year</option>
+                <option value="all">All Time</option>
+                <option value="month">This Month</option>
+                <option value="3months">Last 3 Months</option>
+                <option value="year">This Year</option>
               </select>
 
               <button
+                onclick="clearHistoryFilters()"
                 class="flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-3 text-sm text-zinc-400 transition hover:bg-zinc-800 hover:text-white"
               >
                 <i data-lucide="filter" class="h-4 w-4"></i>
-                Filters
+                Clear Filters
               </button>
             </div>
           </section>

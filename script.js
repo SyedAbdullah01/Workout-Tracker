@@ -79,7 +79,7 @@ function navigateTo(page) {
   // Render saved sessions whenever History is opened
 
   if (page === "history") {
-    renderHistory();
+    initHistoryPage();
   }
 
   // Rebuild the Progress chart whenever that page is opened
@@ -814,7 +814,7 @@ function finishWorkout() {
   const day = currentRoutine[currentSession.dayKey];
 
   const completedSession = {
-    date: new Date().toISOString().slice(0, 10),
+    date: toIsoDate(new Date()),
     dayKey: currentSession.dayKey,
     dayLabel: day.label,
     exercises: currentSession.exercises.map((ex) => ({
@@ -835,6 +835,98 @@ function finishWorkout() {
   navigateTo("history");
 }
 
+let historyFilterName = "all";
+let historyFilterRange = "all";
+
+function getLoggedWorkoutNames() {
+  const names = [];
+
+  loadHistory().forEach((session) => {
+    if (!names.includes(session.dayLabel)) {
+      names.push(session.dayLabel);
+    }
+  });
+
+  return names.sort((a, b) => a.localeCompare(b));
+}
+
+function isWithinHistoryRange(isoDate, range) {
+  if (range === "all") {
+    return true;
+  }
+
+  const sessionDate = new Date(`${isoDate}T00:00:00`);
+  const now = new Date();
+
+  if (range === "month") {
+    return (
+      sessionDate.getFullYear() === now.getFullYear() &&
+      sessionDate.getMonth() === now.getMonth()
+    );
+  }
+
+  if (range === "3months") {
+    const cutoff = new Date(now);
+    cutoff.setMonth(cutoff.getMonth() - 3);
+
+    return sessionDate >= cutoff;
+  }
+
+  if (range === "year") {
+    return sessionDate.getFullYear() === now.getFullYear();
+  }
+
+  return true;
+}
+
+function initHistoryPage() {
+  const nameSelect = document.getElementById("history-filter-name");
+  const rangeSelect = document.getElementById("history-filter-range");
+
+  if (!nameSelect || !rangeSelect) {
+    return;
+  }
+
+  const names = getLoggedWorkoutNames();
+
+  nameSelect.innerHTML =
+    '<option value="all">All Workouts</option>' +
+    names
+      .map(
+        (name) =>
+          `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`,
+      )
+      .join("");
+
+  // Keep the previously selected filter if it's still a valid option,
+  // otherwise fall back to "all" rather than silently losing the filter.
+  historyFilterName = names.includes(historyFilterName)
+    ? historyFilterName
+    : "all";
+
+  nameSelect.value = historyFilterName;
+  rangeSelect.value = historyFilterRange;
+
+  renderHistory();
+}
+
+function handleHistoryFilterChange() {
+  historyFilterName = document.getElementById("history-filter-name").value;
+  historyFilterRange = document.getElementById("history-filter-range").value;
+
+  renderHistory();
+}
+
+function clearHistoryFilters() {
+  historyFilterName = "all";
+  historyFilterRange = "all";
+
+  document.getElementById("history-filter-name").value = "all";
+  document.getElementById("history-filter-range").value = "all";
+
+  renderHistory();
+}
+
 function renderHistory() {
   const listEl = document.getElementById("history-list");
 
@@ -842,13 +934,30 @@ function renderHistory() {
     return;
   }
 
-  const history = loadHistory();
+  const fullHistory = loadHistory();
+
+  const history = fullHistory.filter((session) => {
+    const matchesName =
+      historyFilterName === "all" || session.dayLabel === historyFilterName;
+
+    const matchesRange = isWithinHistoryRange(
+      session.date,
+      historyFilterRange,
+    );
+
+    return matchesName && matchesRange;
+  });
 
   if (history.length === 0) {
+    const message =
+      fullHistory.length === 0
+        ? "No completed workouts yet. Finish a session from Start Workout and it'll show up here."
+        : "No workouts match these filters.";
+
     listEl.innerHTML = `
             <div class="p-8 text-center">
               <p class="text-sm text-zinc-500">
-                No completed workouts yet. Finish a session from Start Workout and it'll show up here.
+                ${message}
               </p>
             </div>
           `;
@@ -1174,7 +1283,7 @@ function exportData() {
   const link = document.createElement("a");
 
   link.href = url;
-  link.download = `workout-tracker-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  link.download = `workout-tracker-backup-${toIsoDate(new Date())}.json`;
 
   document.body.appendChild(link);
   link.click();
@@ -1237,7 +1346,14 @@ function getMondayOfWeek(date) {
 }
 
 function toIsoDate(date) {
-  return date.toISOString().slice(0, 10);
+  // Built from local getters (not toISOString, which is UTC) so a workout
+  // finished late at night or just after midnight is logged under the
+  // correct local calendar day in every timezone.
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 }
 
 function getGreeting() {
