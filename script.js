@@ -210,48 +210,16 @@ const DAY_LABELS = {
 };
 
 // Seed data - only used the very first time the app runs on a browser,
-// before anything has been saved to localStorage yet.
+// before anything has been saved to localStorage yet. Every day starts
+// as a rest day so a fresh visitor sees a genuinely blank app, not a
+// sample routine that isn't theirs.
 const DEFAULT_ROUTINE = {
-  monday: {
-    label: "Push Day",
-    exercises: [
-      { name: "Bench Press", sets: 3 },
-      { name: "Incline DB Press", sets: 3 },
-      { name: "Shoulder Press", sets: 3 },
-      { name: "Lateral Raises", sets: 3 },
-      { name: "Tricep Pushdowns", sets: 3 },
-    ],
-  },
-  tuesday: {
-    label: "Pull Day",
-    exercises: [
-      { name: "Lat Pulldown", sets: 3 },
-      { name: "Barbell Row", sets: 3 },
-      { name: "Cable Row", sets: 3 },
-      { name: "Bicep Curl", sets: 3 },
-    ],
-  },
+  monday: { label: null, exercises: [] },
+  tuesday: { label: null, exercises: [] },
   wednesday: { label: null, exercises: [] },
-  thursday: {
-    label: "Leg Day",
-    exercises: [
-      { name: "Squat", sets: 3 },
-      { name: "Romanian Deadlift", sets: 3 },
-      { name: "Leg Press", sets: 3 },
-      { name: "Leg Curl", sets: 3 },
-      { name: "Calf Raises", sets: 3 },
-    ],
-  },
+  thursday: { label: null, exercises: [] },
   friday: { label: null, exercises: [] },
-  saturday: {
-    label: "Upper Body",
-    exercises: [
-      { name: "Bench Press", sets: 3 },
-      { name: "Pull Ups", sets: 3 },
-      { name: "Shoulder Press", sets: 3 },
-      { name: "Cable Row", sets: 3 },
-    ],
-  },
+  saturday: { label: null, exercises: [] },
   sunday: { label: null, exercises: [] },
 };
 
@@ -1248,7 +1216,7 @@ function renderProgressChart() {
 const PROFILE_NAME_KEY = "workoutTracker.profileName";
 
 function loadProfileName() {
-  return localStorage.getItem(PROFILE_NAME_KEY) || "Abdullah";
+  return localStorage.getItem(PROFILE_NAME_KEY) || "";
 }
 
 function saveProfileName(name) {
@@ -1408,7 +1376,9 @@ function renderDashboardHeader() {
     day: "numeric",
   });
 
-  greetingEl.textContent = `${getGreeting()}, ${loadProfileName()}`;
+  const name = loadProfileName();
+
+  greetingEl.textContent = name ? `${getGreeting()}, ${name}` : getGreeting();
 }
 
 function renderDashboardStats() {
