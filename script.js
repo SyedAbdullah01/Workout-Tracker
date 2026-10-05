@@ -908,10 +908,7 @@ function renderHistory() {
     const matchesName =
       historyFilterName === "all" || session.dayLabel === historyFilterName;
 
-    const matchesRange = isWithinHistoryRange(
-      session.date,
-      historyFilterRange,
-    );
+    const matchesRange = isWithinHistoryRange(session.date, historyFilterRange);
 
     return matchesName && matchesRange;
   });
